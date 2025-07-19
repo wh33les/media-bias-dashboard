@@ -1,0 +1,20 @@
+Moniker,Main Url,Bias,Reliability,Mediatype
+ABC News (website),https://abcnews.go.com/,-3.02,44.77,Web/Articles
+BBC,https://www.bbc.com/,-1.34,44.73,Web/Articles
+CNN (website),https://www.cnn.com/,-6.19,42.13,Web/Articles
+Fox News (website),http://foxnews.com/,11.06,35.31,Web/Articles
+NPR (website),https://www.npr.org/,-4.23,43.1,Web/Articles
+Reuters,https://www.reuters.com/,-1.25,44.98,Web/Articles
+11Alive Atlanta NBC WXIA,http://11alive.com,-3.86,45.75,Web/Articles
+Activist Post,http://activistpost.com,16.32,17.81,Web/Articles
+Advocate Magazine,http://advocate.com,-12.21,40,Web/Articles
+Agence France-Presse,https://www.afp.com/en,-2.4,47.15,Web/Articles
+Air Force Times,http://airforcetimes.com,1.18,46.01,Web/Articles
+Al Jazeera (website),https://www.aljazeera.com,-7.27,41.28,Web/Articles
+ABC: World News Tonight with David Muir,https://abcnews.go.com/WN,-5.82,47.08,TV/Video
+CBS: 60 Minutes,https://www.cbs.com/shows/60_minutes/,-9.55,34.19,TV/Video
+CNN: Anderson Cooper 360,https://www.cnn.com/shows/ac-360,-14.65,33.76,TV/Video
+CNN: The Situation Room,https://www.cnn.com/shows/situation-room,-11.19,42,TV/Video
+"All In Podcast (All-In with Chamath, Jason, Sacks & Friedberg)",https://allinchamathjason.libsyn.com/website,4.5,38.27,Podcast/Audio
+Chapo Trap House,https://soundcloud.com/chapo-trap-house,-28.83,20.87,Podcast/Audio
+Louder With Crowder,http://louderwithcrowder.com,29.71,10.19,Podcast/Audio

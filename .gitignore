@@ -1,0 +1,6 @@
+media-bias-dashboard.code-workspace
+__pycache__
+.venv
+media_bias_reliability_data.csv
+media_bias_scraper.py 
+test_scraper.py
