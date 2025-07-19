@@ -5,8 +5,8 @@ Simple Python config - easy to modify and can include comments
 """
 
 # File paths
-input_file = "data/test_data.csv"
-output_file = "data/test_results.csv"
+input_file = "data/requested_data.csv"
+output_file = "data/final_tableau_data.csv"
 
 # Cache settings
 cache_dir = "cache_files"

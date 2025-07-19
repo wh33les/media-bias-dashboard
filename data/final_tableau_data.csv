@@ -1,0 +1,251 @@
+Moniker,Main Url,Bias,Reliability,Mediatype,has_wikipedia_page,wikipedia_title,wikipedia_avg_daily_views,wikipedia_interest_score,source_prominence_score,robust_influence_score
+11Alive Atlanta NBC WXIA,http://11alive.com,-3.86,45.75,Web/Articles,False,,,0.0,90,27.0
+ABC News (website),https://abcnews.go.com/,-3.02,44.77,Web/Articles,False,,,0.0,90,27.0
+ABC: World News Tonight with David Muir,https://abcnews.go.com/WN,-5.82,47.08,TV/Video,False,,,0.0,90,27.0
+Activist Post,http://activistpost.com,16.32,17.81,Web/Articles,False,,,0.0,30,9.0
+Advocate Magazine,http://advocate.com,-12.21,40.0,Web/Articles,False,,,0.0,30,9.0
+Agence France-Presse,https://www.afp.com/en,-2.4,47.15,Web/Articles,True,Agence France-Presse,293.0,2.9315027322404372,30,11.05
+Air Force Times,http://airforcetimes.com,1.18,46.01,Web/Articles,True,Air Force Times,5.0,0.04669398907103825,30,9.03
+Al Jazeera (website),https://www.aljazeera.com,-7.27,41.28,Web/Articles,True,Al Jazeera Media Network,1578.0,15.784043715846995,30,20.05
+"All In Podcast (All-In with Chamath, Jason, Sacks & Friedberg)",https://allinchamathjason.libsyn.com/website,4.5,38.27,Podcast/Audio,False,,,0.0,50,15.0
+AlterNet,https://www.alternet.org/,-12.21,36.8,Web/Articles,True,AlterNet,78.0,0.779153005464481,30,9.55
+American Action Forum,http://americanactionforum.org,2.0,40.28,Web/Articles,True,American Action Network,43.0,0.42688524590163934,30,9.3
+American Greatness,http://amgreatness.com,22.38,19.04,Web/Articles,False,,,0.0,30,9.0
+American Independent,http://americanindependent.com,-14.61,38.38,Web/Articles,True,American Independent Party,950.0,9.496311475409836,30,15.65
+American Liberty Report,http://americanlibertyemail.com,29.13,10.81,Web/Articles,False,,,0.0,30,9.0
+AP,https://apnews.com/,-2.38,44.82,Web/Articles,False,,,0.0,30,9.0
+Arkansas Democrat-Gazette,http://arkansasonline.com,0.18,45.14,Web/Articles,True,Arkansas Democrat-Gazette,34.0,0.3413387978142077,30,9.24
+Axios,https://www.axios.com/,-3.24,43.12,Web/Articles,True,Axios (website),714.0,7.137923497267759,70,26.0
+Barron's,http://barrons.com,-0.39,44.78,Web/Articles,True,Barron's,92.0,0.9164754098360656,30,9.64
+BBC,https://www.bbc.com/,-1.34,44.73,Web/Articles,True,BBC,5787.0,57.87491803278688,90,67.51
+Before It's News,http://beforeitsnews.com,29.41,6.23,Web/Articles,True,List of miscellaneous fake news websites,86.0,0.8613880126182966,50,15.6
+Big League Politics,https://bigleaguepolitics.com,24.99,18.08,Web/Articles,True,Big League Politics,10.0,0.100327868852459,30,9.07
+Bill O'Reilly,http://billoreilly.com,25.55,21.72,Web/Articles,False,,,0.0,30,9.0
+Blavity News,http://blavity.com,-12.25,32.61,Web/Articles,False,,,0.0,50,15.0
+Bloomberg News,https://www.bloomberg.com/,-3.14,42.18,Web/Articles,True,Bloomberg News,324.0,3.2424316939890714,50,17.27
+BNO News,http://bnonews.com,-0.4,46.37,Web/Articles,True,BNO News,34.0,0.3375136612021858,50,15.24
+Boston Globe,http://bostonglobe.com,-7.85,41.94,Web/Articles,True,The Boston Globe,352.0,3.5228415300546447,30,11.47
+Boston Herald,http://bostonherald.com,9.68,36.31,Web/Articles,True,Boston Herald,91.0,0.9146994535519126,30,9.64
+Breitbart,http://www.breitbart.com/,13.51,31.08,Web/Articles,True,Breitbart News,974.0,9.741693989071038,30,15.82
+Business Insider,http://businessinsider.com,-4.07,40.6,Web/Articles,True,Business Insider,509.0,5.086803278688524,30,12.56
+CBN,http://cbn.com,15.17,34.2,Web/Articles,False,,,0.0,30,9.0
+CBS News (website),https://www.cbsnews.com/,-3.04,41.87,Web/Articles,True,CBS News,432.0,4.324617486338798,90,30.03
+CBS: 60 Minutes,https://www.cbs.com/shows/60_minutes/,-9.55,34.19,TV/Video,True,CBS,2265.0,22.653360655737707,90,42.86
+Chapo Trap House,https://soundcloud.com/chapo-trap-house,-28.83,20.87,Podcast/Audio,True,Chapo Trap House,707.0,7.067240437158469,30,13.95
+Chicago Sun-Times,http://suntimes.com,-4.35,45.44,Web/Articles,True,Chicago Sun-Times,227.0,2.2724043715846993,30,10.59
+Christian Science Monitor,https://www.csmonitor.com/,-2.52,44.23,Web/Articles,True,The Christian Science Monitor,241.0,2.411065573770492,30,10.69
+Christianity Today,http://christianitytoday.com,5.39,41.75,Web/Articles,True,Christianity Today,121.0,1.206311475409836,30,9.84
+Chron.com,http://chron.com,-0.6,46.63,Web/Articles,True,Chron.com,1.0,0.0146045197740113,30,9.01
+City Journal,http://city-journal.org,10.21,35.0,Web/Articles,True,City Journal,50.0,0.49521857923497264,30,9.35
+Climate News,http://climate.news,12.08,19.59,Web/Articles,False,,,0.0,50,15.0
+CNBC (website),http://cnbc.com,-1.81,43.77,Web/Articles,True,CNBC,728.0,7.2810109289617495,90,32.1
+CNET,http://cnet.com,-1.39,40.02,Web/Articles,True,CNET,238.0,2.3841256830601094,30,10.67
+CNN (website),https://www.cnn.com/,-6.19,42.13,Web/Articles,True,CNN,2639.0,26.39308743169399,90,45.48
+CNN: Anderson Cooper 360,https://www.cnn.com/shows/ac-360,-14.65,33.76,TV/Video,True,CNN,2639.0,26.39308743169399,90,45.48
+CNN: The Situation Room,https://www.cnn.com/shows/situation-room,-11.19,42.0,TV/Video,True,CNN,2639.0,26.39308743169399,90,45.48
+Columbia Journalism Review,http://cjr.org,-6.26,43.33,Web/Articles,True,Columbia Journalism Review,35.0,0.3451092896174863,30,9.24
+Common Dreams,http://commondreams.org,-16.86,38.91,Web/Articles,True,Common Dreams,44.0,0.44008196721311477,30,9.31
+Consortium News,http://consortiumnews.com,-16.38,23.1,Web/Articles,True,Robert Parry (journalist),28.0,0.28295081967213115,50,15.2
+Cosmopolitan,http://cosmopolitan.com,-13.65,23.43,Web/Articles,True,Cosmopolitan (magazine),375.0,3.7455737704918035,30,11.62
+CounterPunch,http://counterpunch.org,-21.65,21.1,Web/Articles,True,CounterPunch,60.0,0.5981693989071037,30,9.42
+Crooks and Liars,http://crooksandliars.com,-21.1,21.53,Web/Articles,True,Crooks and Liars,40.0,0.39543715846994537,30,9.28
+Daily Beast,https://www.thedailybeast.com/,-10.53,31.6,Web/Articles,True,The Daily Beast,725.0,7.245409836065574,30,14.07
+Daily Caller,https://dailycaller.com/,12.88,34.45,Web/Articles,True,The Daily Caller,437.0,4.3674043715846995,30,12.06
+Daily Dot,http://dailydot.com,-9.74,25.56,Web/Articles,True,The Daily Dot,88.0,0.8816939890710382,30,9.62
+Daily Kos,https://www.dailykos.com/,-17.68,27.23,Web/Articles,True,Daily Kos,134.0,1.3437158469945356,30,9.94
+Daily Mail,https://www.dailymail.co.uk/,4.6,30.89,Web/Articles,True,Daily Mail,1520.0,15.195956284153006,90,37.64
+Daily Wire,https://www.dailywire.com/,13.15,31.0,Web/Articles,True,The Daily Wire,1691.0,16.911448087431694,30,20.84
+Dallas Morning News,http://dallasnews.com,-1.91,43.65,Web/Articles,True,The Dallas Morning News,81.0,0.8145901639344263,50,15.57
+Democracy Now! (website),https://www.democracynow.org/,-16.15,31.68,Web/Articles,True,Democracy Now!,313.0,3.127786885245902,30,11.19
+Deseret News,http://deseret.com,2.11,42.29,Web/Articles,True,Deseret News,98.0,0.9757103825136612,50,15.68
+Detroit Free Press,http://freep.com,-5.43,43.46,Web/Articles,True,Detroit Free Press,92.0,0.9214754098360656,30,9.65
+Financial Times,https://www.ft.com/,-4.08,44.22,Web/Articles,True,Financial Times,839.0,8.386502732240437,30,14.87
+Fiscal Times,http://www.thefiscaltimes.com/,-4.18,43.33,Web/Articles,True,The Fiscal Times,3.0,0.032021857923497266,30,9.02
+Forbes,https://www.forbes.com/,-2.87,40.63,Web/Articles,True,Forbes,1863.0,18.633715846994534,30,22.04
+Foreign Affairs,http://foreignaffairs.com,-7.39,43.65,Web/Articles,True,Foreign Affairs,232.0,2.31879781420765,30,10.62
+Foreign Policy,https://foreignpolicy.com/,-4.05,42.63,Web/Articles,True,Foreign Policy,200.0,1.9959016393442623,30,10.4
+Fortune,http://fortune.com/,-2.82,36.91,Web/Articles,True,Fortune (magazine),343.0,3.430601092896175,30,11.4
+Forward,http://forward.com,-7.37,40.45,Web/Articles,True,The Forward,132.0,1.321120218579235,30,9.92
+Fox Business (website),http://foxbusiness.com,9.05,38.61,Web/Articles,True,Fox Business,167.0,1.6744535519125683,30,10.17
+Fox Business: The Claman Countdown,https://www.foxbusiness.com/shows/the-claman-countdown,2.33,43.22,TV/Video,True,Fox Business,167.0,1.6744535519125683,30,10.17
+Fox News (website),http://foxnews.com/,11.06,35.31,Web/Articles,True,Fox News,2493.0,24.931147540983606,90,44.45
+Fox News Sunday with Shannon Bream,https://www.foxnews.com/shows/fox-news-sunday,10.3,40.29,TV/Video,False,,,0.0,90,27.0
+Fox News: Fox & Friends,https://www.foxnews.com/shows/fox-and-friends,20.37,30.06,TV/Video,True,Fox News,2493.0,24.931147540983606,90,44.45
+Fox News: Gutfeld!,https://www.foxnews.com/shows/gutfeld,16.5,25.56,TV/Video,True,Fox News,2493.0,24.931147540983606,90,44.45
+Fox News: Hannity,https://www.foxnews.com/shows/hannity,23.88,17.93,TV/Video,True,Fox News,2493.0,24.931147540983606,90,44.45
+Fox News: Jesse Watters Primetime,https://www.foxnews.com/shows/jesse-watters-primetime,22.96,18.58,TV/Video,True,Fox News,2493.0,24.931147540983606,90,44.45
+Fox News: Special Report w/ Bret Baier,https://www.foxnews.com/shows/special-report,10.44,43.41,TV/Video,True,Fox News,2493.0,24.931147540983606,90,44.45
+Fox News: The Five,https://www.foxnews.com/shows/the-five,16.75,27.03,TV/Video,True,Fox News,2493.0,24.931147540983606,90,44.45
+Fox News: The Ingraham Angle,https://www.foxnews.com/shows/ingraham-angle,24.5,20.63,TV/Video,True,Fox News,2493.0,24.931147540983606,90,44.45
+Fox News: The Journal Editorial Report,https://www.foxnews.com/shows/journal-editorial-report,8.22,39.89,TV/Video,True,Fox News,2493.0,24.931147540983606,90,44.45
+Glenn Beck,http://glennbeck.com,23.41,21.21,Web/Articles,True,Glenn Beck,1142.0,11.420218579234973,30,16.99
+Heritage Foundation,http://heritage.org,15.96,28.68,Web/Articles,True,The Heritage Foundation,3500.0,34.99674863387978,30,33.5
+Hill Reporter,http://hillreporter.com,-13.11,32.56,Web/Articles,False,,,0.0,30,9.0
+HuffPost,https://www.huffpost.com/,-10.49,38.1,Web/Articles,True,HuffPost,682.0,6.822540983606557,90,31.78
+In These Times,http://inthesetimes.com,-18.09,33.27,Web/Articles,False,,,0.0,30,9.0
+Independent Journal Review,http://ijr.com,12.68,26.05,Web/Articles,True,Independent Journal Review,23.0,0.2303551912568306,30,9.16
+InfoWars,https://www.infowars.com/,23.46,15.9,Web/Articles,True,Infowars,43.0,0.43142076502732235,30,9.3
+InfoWars: The Alex Jones Show,https://www.infowars.com/show/the-alex-jones-show/,31.67,6.67,TV/Video,True,Infowars,43.0,0.43142076502732235,50,15.3
+Inquisitr,http://inquisitr.com,-7.24,32.92,Web/Articles,True,Inquisitr,8.0,0.08183060109289617,30,9.06
+Jacobin,http://jacobin.com,-21.47,31.69,Web/Articles,True,Jacobins,560.0,5.603661202185792,30,12.92
+Jezebel,http://jezebel.com,-18.2,28.94,Web/Articles,True,Jezebel,1772.0,17.71639344262295,30,21.4
+Judicial Watch,http://judicialwatch.org,23.08,23.83,Web/Articles,True,Judicial Watch,134.0,1.3426502732240437,30,9.94
+Just the News,http://justthenews.com,10.9,32.56,Web/Articles,True,John Solomon (political commentator),165.0,1.6460109289617486,50,16.15
+LA Times,https://www.latimes.com/,-6.35,42.86,Web/Articles,True,Los Angeles Times,862.0,8.618142076502732,30,15.03
+Louder With Crowder,http://louderwithcrowder.com,29.71,10.19,Podcast/Audio,False,,,0.0,30,9.0
+MarketWatch,https://www.marketwatch.com/,-3.88,40.93,Web/Articles,True,MarketWatch,82.0,0.8199180327868852,30,9.57
+Media Matters for America,http://mediamatters.org,-15.06,26.45,Web/Articles,True,Media Matters for America,178.0,1.7793715846994536,30,10.25
+MEDIAite,http://mediaite.com,-8.9,33.57,Web/Articles,False,,,0.0,30,9.0
+MeidasTouch News,http://meidasnews.com,-19.05,22.55,Web/Articles,False,,,0.0,50,15.0
+Mercola,http://mercola.com,18.07,14.53,Web/Articles,True,Joseph Mercola,255.0,2.551584699453552,30,10.79
+Miami Herald,http://miamiherald.com,-8.24,38.74,Web/Articles,True,Miami Herald,99.0,0.9934699453551913,30,9.7
+Mirror - UK,https://www.mirror.co.uk,-3.41,26.88,Web/Articles,False,,,0.0,30,9.0
+Mother Jones,https://www.motherjones.com/,-15.08,35.8,Web/Articles,True,Mother Jones,282.0,2.8227322404371584,30,10.98
+MSNBC (website),http://msnbc.com/,-13.89,34.6,Web/Articles,True,MSNBC,1703.0,17.02795081967213,90,38.92
+MSNBC TV Network,https://www.msnbc.com/schedule,-17.83,28.5,TV/Video,False,,,0.0,90,27.0
+MSNBC: All In with Chris Hayes,https://www.msnbc.com/all,-18.43,22.4,TV/Video,True,MSNBC,1703.0,17.02795081967213,90,38.92
+MSNBC: The Briefing with Jen Psaki,https://www.msnbc.com/jen-psaki,-19.11,25.48,TV/Video,True,MSNBC,1703.0,17.02795081967213,90,38.92
+MSNBC: The Last Word with Lawrence O'Donnell,https://www.msnbc.com/the-last-word,-19.61,28.48,TV/Video,True,MSNBC,1703.0,17.02795081967213,90,38.92
+MSNBC: The Rachel Maddow Show,https://www.msnbc.com/rachel-maddow-show,-17.89,35.15,TV/Video,True,MSNBC,1703.0,17.02795081967213,90,38.92
+National Catholic Register,http://ncregister.com,11.37,31.78,Web/Articles,True,National Catholic Register,43.0,0.4346448087431694,30,9.3
+National Review,https://www.nationalreview.com/,12.85,31.3,Web/Articles,True,National Review,533.0,5.331174863387978,30,12.73
+Natural News,http://naturalnews.com,28.1,9.27,Web/Articles,True,Natural News,225.0,2.2503551912568307,50,16.58
+NBC News (website),https://www.nbcnews.com,-5.62,42.77,Web/Articles,True,NBC News,556.0,5.55620218579235,90,30.89
+New Republic,https://newrepublic.com/,-16.83,29.78,Web/Articles,True,The New Republic,731.0,7.3127868852459015,30,14.12
+New York Post,https://nypost.com/,9.33,31.79,Web/Articles,True,New York Post,1163.0,11.633879781420765,30,17.14
+New York Sun,http://nysun.com,12.84,31.5,Web/Articles,True,The New York Sun,135.0,1.3491803278688526,30,9.94
+NewsBusters,https://www.newsbusters.org,20.48,19.99,Web/Articles,True,Media Research Center,146.0,1.4562295081967214,50,16.02
+Newsday,http://newsday.com,-3.51,46.71,Web/Articles,True,Newsday,133.0,1.328360655737705,50,15.93
+Newser,http://newser.com,-5.52,36.83,Web/Articles,True,Newser,15.0,0.14595628415300546,50,15.1
+Newsmax (website),https://www.newsmax.com/,13.44,29.1,Web/Articles,True,Newsmax,815.0,8.146475409836064,50,20.7
+NewsNation (website),http://newsnationnow.com,0.22,42.98,Web/Articles,True,NewsNation,1594.0,15.941010928961749,50,26.16
+NewsNation: The Hill,https://www.newsnationnow.com/the-hill/,4.33,34.11,TV/Video,True,NewsNation,1594.0,15.941010928961749,70,32.16
+NewsTarget,http://newstarget.com,29.87,7.74,Web/Articles,True,Natural News,225.0,2.2503551912568307,50,16.58
+Newsweek,http://newsweek.com,-1.81,39.11,Web/Articles,True,Newsweek,747.0,7.474098360655738,50,20.23
+NPR (website),https://www.npr.org/,-4.23,43.1,Web/Articles,True,NPR,1161.0,11.611065573770492,90,35.13
+NPR News Now,https://www.npr.org/podcasts/500005/npr-news-now,-0.28,49.33,Podcast/Audio,True,NPR,1161.0,11.611065573770492,90,35.13
+NPR: Code Switch,https://www.npr.org/podcasts/510312/codeswitch,-16.54,36.87,Podcast/Audio,True,NPR,1161.0,11.611065573770492,90,35.13
+NPR: Up First,https://www.npr.org/podcasts/510318/up-first,-9.44,43.07,Podcast/Audio,True,NPR,1161.0,11.611065573770492,90,35.13
+NutriTruth,http://nutritruth.org,26.29,8.0,Web/Articles,False,,,0.0,30,9.0
+NY Daily News,http://nydailynews.com,-8.1,34.12,Web/Articles,True,New York Daily News,271.0,2.706311475409836,50,16.89
+NYT: The Daily,https://www.nytimes.com/column/the-daily,-9.63,41.56,Podcast/Audio,True,The New York Times,4876.0,48.758005464480874,90,61.13
+OAN Network (website),https://www.oann.com/,14.02,28.46,Web/Articles,False,,,0.0,30,9.0
+OAN TV Network,https://www.oann.com/schedule/,22.33,16.33,TV/Video,False,,,0.0,50,15.0
+Orange County Register,http://ocregister.com,5.43,40.58,Web/Articles,True,The Orange County Register,38.0,0.37846994535519124,30,9.26
+OutKick,http://outkick.com,13.94,27.1,Web/Articles,True,OutKick,218.0,2.1817486338797814,30,10.53
+Palmer Report,https://www.palmerreport.com/,-23.36,19.18,Web/Articles,True,Palmer Report,89.0,0.8889344262295081,30,9.62
+Patch,http://patch.com,-3.54,46.09,Web/Articles,True,Patch Media,29.0,0.29448087431693987,30,9.21
+PBS,https://www.pbs.org/,-3.93,43.42,Web/Articles,True,PBS,4124.0,41.23762295081967,70,49.87
+PBS News Hour,https://www.pbs.org/show/newshour,-8.68,43.48,TV/Video,True,PBS News Hour,108.0,1.0782513661202187,70,21.75
+People Magazine,http://people.com,-5.53,41.58,Web/Articles,True,People (magazine),995.0,9.948879781420764,30,15.96
+PJ Media,https://pjmedia.com/,21.59,18.8,Web/Articles,True,PJ Media,75.0,0.7514207650273224,30,9.53
+Pod Save America,https://crooked.com/podcast-series/pod-save-america/,-22.94,27.55,Podcast/Audio,True,Pod Save America,406.0,4.063005464480875,70,23.84
+Politico,https://www.politico.com/,-5.33,42.37,Web/Articles,True,Politico,865.0,8.651092896174863,70,27.06
+Politifact,http://politifact.com,-3.51,44.67,Web/Articles,True,PolitiFact,170.0,1.7027595628415302,30,10.19
+PolitiZoom,http://politizoom.com,-19.11,17.54,Web/Articles,False,,,0.0,30,9.0
+Poynter,http://poynter.org,-7.32,41.75,Web/Articles,True,Poynter,3.0,0.025191256830601094,30,9.02
+PragerU,http://prageru.com,18.63,23.34,TV/Video,True,PragerU,776.0,7.758060109289618,30,14.43
+ProPublica,https://www.propublica.org/,-6.79,47.27,Web/Articles,True,ProPublica,319.0,3.188743169398907,30,11.23
+Published Reporter,http://publishedreporter.com,15.48,26.86,Web/Articles,False,,,0.0,30,9.0
+Quillette,http://quillette.com,9.27,37.53,Web/Articles,True,Quillette,122.0,1.2171311475409836,30,9.85
+Rasmussen Reports,http://rasmussenreports.com,13.78,34.05,Web/Articles,True,Rasmussen Reports,475.0,4.749535519125683,30,12.32
+Raw Story,http://rawstory.com,-13.54,34.94,Web/Articles,True,Raw Story,133.0,1.3276229508196722,30,9.93
+RealClearPolitics,http://realclearpolitics.com,14.45,26.9,Web/Articles,True,RealClearPolitics,486.0,4.862021857923497,30,12.4
+Reason,https://reason.com/,4.72,36.29,Web/Articles,True,Reason,682.0,6.820027322404371,30,13.77
+Rebel News,http://rebelnews.com,12.16,27.06,Web/Articles,True,Rebel News,344.0,3.4399180327868852,50,17.41
+RedState,https://www.redstate.com/,21.57,20.85,Web/Articles,True,RedState,69.0,0.6945081967213115,30,9.49
+Reuters,https://www.reuters.com/,-1.25,44.98,Web/Articles,True,Reuters,1426.0,14.262431693989072,90,36.98
+Right Wing Watch | People For the American Way,https://www.peoplefor.org/rightwingwatch,-18.22,27.23,Web/Articles,True,People for the American Way,80.0,0.7957103825136612,30,9.56
+Rolling Stone,http://rollingstone.com,-13.76,26.24,Web/Articles,True,Rolling Stone,2086.0,20.8581693989071,30,23.6
+RT Russia Today,http://rt.com,11.46,28.66,Web/Articles,False,,,0.0,30,9.0
+Rumble with Michael Moore,https://www.michaelmoore.com/archive,-22.14,24.95,Podcast/Audio,False,,,0.0,30,9.0
+Salon,http://salon.com,-13.48,32.98,Web/Articles,True,Salon.com,150.0,1.4952732240437157,30,10.05
+Scripps News (website),https://scrippsnews.com/,-1.72,43.68,Web/Articles,True,Scripps News,364.0,3.6424316939890713,50,17.55
+Scripps News: Weekend,https://www.scrippsnews.com/shows/scripps-news-weekend,-5.11,44.33,TV/Video,True,Scripps News,364.0,3.6424316939890713,50,17.55
+Sky News,https://news.sky.com/,-0.78,41.79,Web/Articles,True,Sky News,752.0,7.521284153005464,50,20.26
+Slate,https://slate.com/,-12.68,35.38,Web/Articles,True,Slate,486.0,4.864262295081968,70,24.4
+SmartLess,https://www.smartless.com/episodes,-15.97,35.5,Podcast/Audio,True,SmartLess,262.0,2.6189071038251366,30,10.83
+Socialist Alternative,http://socialistalternative.org,-23.8,26.17,Web/Articles,False,,,0.0,30,9.0
+Straight Arrow News,https://san.com,1.22,39.5,Web/Articles,True,Joe Ricketts,159.0,1.590792349726776,50,16.11
+Talking Points Memo,http://talkingpointsmemo.com/,-11.79,35.81,Web/Articles,True,Talking Points Memo,48.0,0.47800546448087433,30,9.33
+Tangle,https://www.readtangle.com,1.58,43.04,Web/Articles,True,Godtube,28.0,0.27939890710382514,30,9.2
+Teen Vogue,http://teenvogue.com,-15.5,37.79,Web/Articles,True,Teen Vogue,155.0,1.5487704918032787,30,10.08
+The American Conservative,https://www.theamericanconservative.com,14.44,31.63,Web/Articles,True,The American Conservative,135.0,1.351120218579235,30,9.95
+The American Spectator,http://spectator.org,22.83,17.64,Web/Articles,True,The American Spectator,86.0,0.856639344262295,30,9.6
+The Atlantic,https://www.theatlantic.com/,-9.31,38.05,Web/Articles,True,The Atlantic,1014.0,10.138060109289619,30,16.1
+The Ben Shapiro Show,https://www.dailywire.com/show/the-ben-shapiro-show,19.62,25.39,Podcast/Audio,True,The Ben Shapiro Show,87.0,0.8704918032786886,50,15.61
+The Blaze,https://www.theblaze.com/,13.33,30.95,Web/Articles,True,Blaze Media,355.0,3.551338797814208,30,11.49
+The Bulwark,http://thebulwark.com,-3.36,34.25,Web/Articles,True,The Bulwark (website),396.0,3.9636065573770494,30,11.77
+The Bulwark Podcast,https://podcast.thebulwark.com/,-14.95,32.47,Podcast/Audio,False,,,0.0,50,15.0
+The Center Square,http://thecentersquare.com,3.84,40.29,Web/Articles,True,The Center Square,35.0,0.3519125683060109,30,9.25
+The Charlie Kirk Show,https://charliekirk.com/podcasts/,26.09,13.38,Podcast/Audio,True,Charlie Kirk,5389.0,53.88767759562841,50,52.72
+The Christian Post,http://christianpost.com,10.65,36.16,Web/Articles,True,The Christian Post,31.0,0.3146174863387978,30,9.22
+The College Fix,http://thecollegefix.com,10.31,34.39,Web/Articles,True,The College Fix,11.0,0.10707650273224044,30,9.07
+The Daily Signal,https://www.dailysignal.com/,17.1,20.15,Web/Articles,True,The Daily Signal,72.0,0.721639344262295,90,27.51
+The Dispatch,http://thedispatch.com,5.33,41.19,Web/Articles,True,The Dispatch,183.0,1.8314480874316938,30,10.28
+The Dispatch Podcast,https://thedispatch.com/podcast/dispatch-podcast/,5.98,38.81,Podcast/Audio,True,The Dispatch,183.0,1.8314480874316938,50,16.28
+The Economist,https://www.economist.com/,-1.93,42.21,Web/Articles,True,The Economist,1176.0,11.757814207650274,30,17.23
+The Epoch Times,http://theepochtimes.com,14.73,26.99,Web/Articles,True,The Epoch Times,2277.0,22.76636612021858,30,24.94
+The Federalist,http://thefederalist.com/,18.39,22.16,Web/Articles,True,The Federalist Papers,963.0,9.632677595628415,30,15.74
+The Gateway Pundit,https://www.thegatewaypundit.com/,23.56,14.97,Web/Articles,True,The Gateway Pundit,1315.0,13.147240437158471,30,18.2
+The Globe and Mail,http://theglobeandmail.com,-1.14,43.99,Web/Articles,True,The Globe and Mail,329.0,3.286448087431694,30,11.3
+The Grayzone,http://thegrayzone.com,-24.87,17.88,Web/Articles,True,The Grayzone,679.0,6.785491803278688,30,13.75
+The Guardian,https://www.theguardian.com/,-8.14,40.15,Web/Articles,True,The Guardian,3613.0,36.125245901639346,30,34.29
+The Hartmann Report,http://hartmannreport.com,-22.32,17.11,Web/Articles,True,Thom Hartmann,210.0,2.100081967213115,30,10.47
+The Hill,https://thehill.com/,-1.28,41.76,Web/Articles,True,The Hill (newspaper),813.0,8.132650273224044,70,26.69
+The Independent,https://www.independent.co.uk/us,-6.88,38.49,Web/Articles,True,The Independent,904.0,9.040928961748634,30,15.33
+The Intercept,https://theintercept.com/,-14.01,37.43,Web/Articles,True,The Intercept,423.0,4.233715846994535,30,11.96
+The Jimmy Dore Show,https://jimmydore.com/,-25.07,12.33,Podcast/Audio,True,Jimmy Dore,667.0,6.668032786885246,50,19.67
+The Lever,http://levernews.com,-17.42,36.18,Web/Articles,True,The Lever,31.0,0.31308743169398906,30,9.22
+The Mark Levin Show,https://www.marklevinshow.com/,30.45,10.84,Podcast/Audio,True,The Mark Levin Show,63.0,0.6320491803278688,50,15.44
+The Marshall Project,http://themarshallproject.org,-6.0,46.17,Web/Articles,True,The Marshall Project,59.0,0.5946448087431694,30,9.42
+The Megyn Kelly Show,https://www.devilmaycaremedia.com/megynkellyshow,14.91,30.74,Podcast/Audio,True,Megyn Kelly,5670.0,56.69622950819672,50,54.69
+The Nation,https://www.thenation.com/,-18.99,30.85,Web/Articles,True,The Nation,337.0,3.371530054644809,30,11.36
+The New Abnormal,https://www.thedailybeast.com/franchise/the-new-abnormal,-23.2,15.42,Podcast/Audio,True,The New Abnormal,426.0,4.264098360655738,30,11.98
+The New York Times,https://www.nytimes.com/,-8.06,41.03,Web/Articles,True,The New York Times,4876.0,48.758005464480874,90,61.13
+The New Yorker,https://www.newyorker.com/news,-12.25,40.91,Web/Articles,True,The New Yorker,992.0,9.917377049180327,30,15.94
+The People's Voice,http://thepeoplesvoice.tv,24.5,14.32,Web/Articles,True,The People's Voice,9.0,0.09327868852459016,30,9.07
+The Post & Email,http://thepostemail.com,23.42,15.22,Web/Articles,False,,,0.0,30,9.0
+The Post Millennial,http://thepostmillennial.com,12.14,31.43,Web/Articles,True,The Post Millennial,112.0,1.1157923497267759,30,9.78
+The Root,http://theroot.com,-18.47,26.47,Web/Articles,True,The Root,10.0,0.10062841530054645,30,9.07
+The Rubin Report,https://podcasts.apple.com/us/podcast/the-rubin-report/id1052842770,22.97,22.24,Podcast/Audio,True,The Rubin Report,140.0,1.3982513661202185,30,9.98
+The Spectator World,http://thespectator.com,12.79,28.3,Web/Articles,True,The Spectator,650.0,6.50431693989071,30,13.55
+The Tony Michaels Podcast,https://pod.link/1561049560,-30.67,13.73,Podcast/Audio,False,,,0.0,50,15.0
+The Verge,http://theverge.com,-7.23,38.14,Web/Articles,True,The Verge,276.0,2.7628142076502735,30,10.93
+The Washington Free Beacon,https://freebeacon.com/,14.27,23.86,Web/Articles,True,The Washington Free Beacon,154.0,1.544207650273224,30,10.08
+The Weather Channel,http://weather.com,-1.85,46.2,Web/Articles,True,The Weather Channel,715.0,7.151939890710382,30,14.01
+The Week,https://www.theweek.com/,-10.69,38.39,Web/Articles,True,The Week,147.0,1.4748360655737704,30,10.03
+The Weekly Show with Jon Stewart,https://www.youtube.com/@WeeklyShowPodcast,-18.08,32.33,Podcast/Audio,False,,,0.0,50,15.0
+The Will Cain Podcast,https://radio.foxnews.com/podcast/will-cain-podcast,15.11,29.33,Podcast/Audio,False,,,0.0,50,15.0
+TheGrio,http://thegrio.com,-10.82,39.55,Web/Articles,True,TheGrio,160.0,1.5961748633879782,30,10.12
+Timcast IRL,https://timcast.com/channel/timcast-irl/,23.83,9.9,Podcast/Audio,True,Tim Pool,1506.0,15.057377049180326,30,19.54
+Time Magazine,http://time.com/,-7.43,41.1,Web/Articles,True,Time (magazine),1497.0,14.971857923497268,30,19.48
+TMZ,http://tmz.com,-4.4,34.6,Web/Articles,True,TMZ,985.0,9.847841530054644,90,33.89
+Townhall,http://townhall.com,19.52,25.05,Web/Articles,True,Townhall,55.0,0.5535792349726776,30,9.39
+Truthout,https://truthout.org/,-16.87,33.35,Web/Articles,True,Truthout,65.0,0.6525136612021858,30,9.46
+Turning Point USA,http://tpusa.com,16.97,20.6,Web/Articles,True,Turning Point USA,1092.0,10.91860655737705,30,16.64
+Twitchy,https://twitchy.com/,20.93,17.83,Web/Articles,True,Twitchy,34.0,0.3368032786885246,30,9.24
+TYT: The Conversation,https://www.youtube.com/@TYTConversation,-24.17,21.52,TV/Video,False,,,0.0,30,9.0
+TYT: The Young Turks,http://tyt.com,-24.79,25.44,TV/Video,False,,,0.0,30,9.0
+UPI,http://upi.com,-1.15,45.37,Web/Articles,True,United Press International,215.0,2.1489890710382515,30,10.5
+Upworthy,http://upworthy.com,-5.57,39.86,Web/Articles,True,Upworthy,42.0,0.4219398907103825,30,9.3
+US News and World Report,https://usnews.com,-2.99,43.68,Web/Articles,True,U.S. News & World Report,583.0,5.834890710382513,50,19.08
+USA Today,https://www.usatoday.com/,-3.8,40.87,Web/Articles,True,USA Today,621.0,6.20775956284153,90,31.35
+USAFacts,http://usafacts.org,-0.05,50.24,Web/Articles,True,USAFacts,92.0,0.9197267759562842,30,9.64
+Vanity Fair,https://www.vanityfair.com/,-13.86,33.29,Web/Articles,False,,,0.0,30,9.0
+Vogue,http://vogue.com,-10.91,39.13,Web/Articles,True,Vogue (magazine),1136.0,11.356857923497268,30,16.95
+Vox,https://www.vox.com/,-10.01,39.66,Web/Articles,True,Vox (website),455.0,4.55431693989071,70,24.19
+Wall Street Journal,https://www.wsj.com/,4.18,43.34,Web/Articles,True,The Wall Street Journal,1439.0,14.38844262295082,30,19.07
+Washington Examiner,https://www.washingtonexaminer.com/,11.28,34.0,Web/Articles,True,Washington Examiner,234.0,2.3369945355191257,30,10.64
+Washington Monthly,https://washingtonmonthly.com/,-12.08,35.78,Web/Articles,True,Washington Monthly,48.0,0.483224043715847,30,9.34
+Washington Post,https://www.washingtonpost.com,-7.08,38.67,Web/Articles,True,The Washington Post,2242.0,22.4174043715847,90,42.69
+Washington Times,https://www.washingtontimes.com,11.59,33.5,Web/Articles,True,The Washington Times,339.0,3.3925956284153007,30,11.37
+Western Journal,http://westernjournal.com,19.5,21.26,Web/Articles,True,The Western Journal,83.0,0.8334699453551913,30,9.58
+WIRED,http://wired.com,-7.29,37.18,Web/Articles,True,Wired (magazine),359.0,3.5921857923497265,30,11.51
+WND,https://www.wnd.com/,21.12,13.14,Web/Articles,True,WorldNetDaily,156.0,1.5613387978142077,30,10.09
+Wonkette,https://www.wonkette.com/,-24.99,20.15,Web/Articles,True,Wonkette,24.0,0.24005464480874317,30,9.17
+World News Group,http://wng.org,7.34,41.25,Web/Articles,True,World (magazine),39.0,0.3887158469945355,50,15.27
+World Socialist Web Site,http://wsws.org,-25.91,29.1,Web/Articles,True,World Socialist Web Site,85.0,0.8541803278688525,30,9.6
+WSJ: Potomac Watch,https://www.wsj.com/podcasts/opinion-potomac-watch,2.33,41.07,Podcast/Audio,True,The Wall Street Journal,1439.0,14.38844262295082,30,19.07
+WSJ: The Journal.,https://www.wsj.com/podcasts/the-journal,-0.5,47.11,Podcast/Audio,True,The Wall Street Journal,1439.0,14.38844262295082,30,19.07
+ZeroHedge,http://zerohedge.com,16.57,20.7,Web/Articles,True,Zero Hedge,521.0,5.2092896174863395,30,12.65
