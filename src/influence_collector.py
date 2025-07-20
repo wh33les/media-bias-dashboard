@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
+# influence_collector.py
 """
 Multi-Medium Influence Collector (Simplified Configurable Version)
 Works reliably for Web Articles, TV Shows, AND Podcasts
-Uses only stable, reliable data sources - no fragile APIs
 SAVES PROGRESS TO DISK - can resume if interrupted!
 
 Simple configuration via config.py file
@@ -50,12 +49,11 @@ class RobustInfluenceCollector:
 
         logging.info(f"Enabled scorers and weights: {self.enabled_scorers}")
 
-        # Initialize session only if we have APIs that make HTTP requests
-        api_clients_enabled = {
-            k: v for k, v in self.enabled_scorers.items() if k != "heuristics"
-        }
+        # Create cache managers for each enabled API (appears in later conditionals)
+        self.api_managers = {}
 
-        if api_clients_enabled:
+        # Initialize session only if we have APIs that make HTTP requests
+        if any(k != "heuristics" for k in self.enabled_scorers.keys()):
             # Import APIManager only when APIs are actually enabled
             from apis.api_manager import APIManager, RateLimitExceeded
 
@@ -65,14 +63,9 @@ class RobustInfluenceCollector:
             self.session.headers.update({"User-Agent": config.user_agent})
             logging.info("HTTP session initialized for API clients")
 
-            # Create cache managers for each enabled API
-            self.api_managers = {}
-
         else:
             # No APIs enabled - don't import APIManager at all
-            self.RateLimitExceeded = None
-            self.session = None
-            self.api_managers = {}
+            self.RateLimitExceeded = None  # Needed for a later conditional
             logging.info(
                 "No API clients enabled - skipping HTTP session and cache management setup"
             )
@@ -108,7 +101,7 @@ class RobustInfluenceCollector:
             # self.listen_notes_api = ListenNotesAPI(cache_manager=self.api_managers["listen_notes"])
             logging.info("Listen Notes API enabled but not yet implemented")
 
-    def get_source_prominence_score(self, source_name, url=None):
+    def get_source_prominence_score(self, source_name):
         """Calculate prominence score using configured tiers"""
         clean_source_name = source_name.strip()
         name_lower = clean_source_name.lower()
@@ -220,15 +213,13 @@ class RobustInfluenceCollector:
                     )
 
                     # Save all caches when any API hits rate limit
-                    self.save_all_caches()
+                    self.save_all_caches_to_disk()
                     break
                 raise
 
             # Get prominence score if enabled
             if "heuristics" in self.enabled_scorers:
-                prominence_data = self.get_source_prominence_score(
-                    clean_source_name, url
-                )
+                prominence_data = self.get_source_prominence_score(clean_source_name)
                 all_metrics.update(prominence_data)
 
             # Calculate final score
@@ -240,15 +231,18 @@ class RobustInfluenceCollector:
                 if key in df.columns:
                     df.at[idx, key] = value
 
-            time.sleep(config.request_delay)
+            # Sleep and cache (for APIs)
+            if self.api_managers:
+                time.sleep(config.request_delay)
 
-            # Save progress periodically - now saves ALL caches
-            if (idx + 1) % config.save_frequency == 0:
-                self.save_all_caches()
-                logging.info(f"Progress saved ({idx + 1}/{len(df)})")
+                # Save progress periodically within the same API check
+                if (idx + 1) % config.save_frequency == 0:
+                    self.save_all_caches_to_disk()
+                    logging.info(f"Cache files saved to disk ({idx + 1}/{len(df)})")
 
-        # Final save - saves ALL caches
-        self.save_all_caches()
+        # Final save - only if APIs exist
+        if self.api_managers:  # Only save if there are API managers
+            self.save_all_caches_to_disk()
 
         # Convert to proper numeric types for only the columns that exist
         numeric_columns = self._get_numeric_columns()
@@ -274,7 +268,7 @@ class RobustInfluenceCollector:
         # Add other APIs as needed
         return numeric_columns
 
-    def save_all_caches(self):
+    def save_all_caches_to_disk(self):
         """Save all enabled API caches to disk"""
         if not hasattr(self, "api_managers") or not self.api_managers:
             logging.debug("No API managers to save")
@@ -294,13 +288,38 @@ class RobustInfluenceCollector:
         processed = df["robust_influence_score"].notna().sum()
         print(f"Processed: {processed}/{total_sources} sources")
 
-        # Add detailed API call information:
-        if hasattr(self, "wikipedia_api"):
-            elapsed_hours = (
-                datetime.now() - self.wikipedia_api.session_start_time
-            ).total_seconds() / 3600
-            print(f"Total API calls made: {self.wikipedia_api.api_call_count}")
-            print(f"Runtime: {elapsed_hours:.2f} hours")
+        # Add detailed API call information - efficient version:
+        if self.api_managers:
+            # Quick check without detailed processing
+            total_calls = sum(mgr.api_call_count for mgr in self.api_managers.values())
+
+            if total_calls > 0:
+                # Get detailed info (earliest_start, api_details) without recalculating total_calls
+                _, earliest_start, api_details = self._get_api_stats()
+                print(f"Total API calls made: {total_calls}")
+
+                if earliest_start is not None:
+                    elapsed_hours = (
+                        datetime.now() - earliest_start
+                    ).total_seconds() / 3600
+                    print(f"Runtime: {elapsed_hours:.2f} hours")
+
+                # Show per-API breakdown
+                if api_details:
+                    print("API breakdown:")
+                    for detail in api_details:
+                        print(f"  - {detail}")
+            else:
+                # APIs enabled but no calls made (all cache hits)
+                print(f"Total API calls made: 0 (all data served from cache)")
+                print("Enabled APIs:")
+                for api_name, mgr in self.api_managers.items():
+                    cache_entries = len(mgr.cache_data)
+                    print(f"  - {api_name}: {cache_entries} cached entries")
+        else:
+            # No APIs enabled at all (heuristics only)
+            print(f"Total API calls made: 0 (heuristics-only processing)")
+            print(f"Enabled scorers: {', '.join(self.enabled_scorers.keys())}")
 
         # Top 10 overall
         print(f"\nTOP INFLUENCE SCORES:")
@@ -314,6 +333,27 @@ class RobustInfluenceCollector:
                 print(
                     f"{i:2}. {row['Moniker'][:35]}... ({score:.1f}) [{media_type}] {wiki}"
                 )
+
+    def _get_api_stats(self):
+        """Get aggregated API statistics from all enabled APIs"""
+        total_calls = 0
+        earliest_start = None
+        api_details = []
+
+        for api_name, api_manager in self.api_managers.items():
+            calls = api_manager.api_call_count
+            total_calls += calls
+
+            if calls > 0:  # Only include APIs that were actually used
+                api_details.append(f"{api_name}: {calls} calls")
+
+                if (
+                    earliest_start is None
+                    or api_manager.session_start_time < earliest_start
+                ):
+                    earliest_start = api_manager.session_start_time
+
+        return total_calls, earliest_start, api_details
 
 
 def main():
@@ -338,7 +378,7 @@ def main():
         return 1
     except KeyboardInterrupt:
         print("\nInterrupted. Progress saved.")
-        collector.save_all_caches()
+        collector.save_all_caches_to_disk()
         return 1
 
 
