@@ -15,11 +15,6 @@ output_file = "data/test_results.csv"
 cache_dir = "cache_files"
 save_frequency = 10  # Save progress every N items
 
-# API settings
-user_agent = "media-bias-dashboard/1.0 (https://github.com/wh33les/data-visualization-portfolio; contact via GitHub) Python-requests/2.32.4"
-timeout_seconds = 5
-request_delay = 0.1  # Seconds between requests
-
 # Heurestics and APIs (scores should add up to 100)
 scorers_config = {
     "heuristics": 30,  # Heuristics for all media types (default)
@@ -28,6 +23,11 @@ scorers_config = {
     "similarweb": 0,  # Websites (paid, https://account.similarweb.com/)
     "listen_notes": 0,  # Podcast data (paid, https://www.listennotes.com/api/)
 }
+
+# API settings
+user_agent = "media-bias-dashboard/1.0 (https://github.com/wh33les/data-visualization-portfolio; contact via GitHub) Python-requests/2.32.4"
+timeout_seconds = 5
+request_delay = 0.1  # Seconds between requests
 
 # API cache filenames
 api_cache_files = {
@@ -39,7 +39,7 @@ api_cache_files = {
 
 # API rate limits (calls per hour)
 api_rate_limits = {
-    "wikipedia": 500,
+    "wikipedia": 10,
     "youtube": 10000,
     "similarweb": 100,
     "listen_notes": 1000,

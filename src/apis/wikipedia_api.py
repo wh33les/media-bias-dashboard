@@ -123,13 +123,3 @@ class WikipediaAPI:
             self.api_manager.add_to_cache(cache_key, result)
 
         return result
-
-    @property
-    def api_call_count(self):
-        """Backwards compatibility property"""
-        return self.api_manager.api_call_count
-
-    @property
-    def session_start_time(self):
-        """Backwards compatibility property"""
-        return self.api_manager.session_start_time
