@@ -1,31 +1,58 @@
 #!/usr/bin/env python3
 """
-YouTube API Client
-Gets YouTube channel and video metrics including subscriber counts, view counts, and engagement
+YouTube API Client using standardized BaseAPI
+Gets YouTube channel and video metrics with consistent quota tracking
 """
 
-import requests
-import time
 import logging
 import re
 import os
+from typing import Optional, Dict, Any
 from urllib.parse import parse_qs, urlparse
 
+from .base_api import BaseAPI
+from .api_manager import RateLimitExceeded
 
-class YouTubeAPI:
-    """YouTube Data API v3 client for video and channel metrics"""
 
-    def __init__(self, api_key=None, api_manager=None):
+class YouTubeAPI(BaseAPI):
+    """YouTube Data API v3 client with standardized quota management"""
+
+    def __init__(self, api_key=None, session=None, api_manager=None):
+        # Call parent constructor for common setup
+        super().__init__("YouTube", session=session, api_manager=api_manager)
+
+        # YouTube-specific initialization
         self.api_key = api_key or os.getenv("YOUTUBE_API_KEY")
         self.base_url = "https://www.googleapis.com/youtube/v3"
-        self.session = requests.Session()
-        self.cache = {}
-        self.api_manager = api_manager
 
         if not self.api_key:
             logging.warning(
-                "YouTube API key not found. Set YOUTUBE_API_KEY environment variable."
+                "YouTube API key not found. Set YOUTUBE_API_KEY in environment variable."
             )
+        else:
+            logging.debug(f"YouTube API initialized with key: {self.api_key[:8]}...")
+
+    def _define_api_costs(self):
+        """
+        YouTube API cost structure in quota units
+        Based on official YouTube API quota costs
+        """
+        return {
+            "search": 100,  # Very expensive! Search operations
+            "channel_details": 1,  # Cheap - Get channel by ID
+            "channel_by_username": 1,  # Cheap - Get channel by username
+            "video_details": 1,  # Cheap - Get video statistics
+            "video_list": 1,  # Cheap - List videos by channel
+            "standard": 1,  # Default cost
+        }
+
+    def is_enabled(self):
+        """Check if API is properly configured"""
+        return bool(self.api_key)
+
+    def get_supported_media_types(self):
+        """Return supported media types"""
+        return ["TV/Video", "Podcast/Audio"]
 
     def _extract_channel_info(self, url, source_name):
         """Extract channel ID or username from URL or source name"""
@@ -66,15 +93,30 @@ class YouTubeAPI:
         # Add "official" to help find official channels
         return f"{search_term} official"
 
-    def _make_request(self, endpoint, params=None):
-        """Make API request with error handling"""
+    def _make_request(
+        self,
+        endpoint: str,
+        params: Optional[Dict[str, Any]] = None,
+        call_type: str = "standard",
+    ) -> Optional[Dict[str, Any]]:
+        """Make API request with standardized quota tracking"""
         if not self.api_key:
             return None
+
+        # Check quota before making expensive calls
+        if self.check_quota_limit(call_type):
+            logging.error(f"Skipping {endpoint} call - would exceed quota limit")
+            raise RateLimitExceeded(
+                f"YouTube quota limit would be exceeded by {call_type} call"
+            )
 
         url = f"{self.base_url}/{endpoint}"
         request_params = {"key": self.api_key}
         if params:
             request_params.update(params)
+
+        # Use standardized logging with call type
+        self.log_api_call(f"{endpoint} API call", call_type=call_type)
 
         try:
             response = self.session.get(url, params=request_params, timeout=10)
@@ -85,6 +127,7 @@ class YouTubeAPI:
                 error_data = response.json()
                 if "quotaExceeded" in str(error_data):
                     logging.warning("YouTube API quota exceeded")
+                    raise RateLimitExceeded("YouTube API quota exceeded")
                 else:
                     logging.warning(f"YouTube API forbidden: {error_data}")
                 return None
@@ -97,54 +140,71 @@ class YouTubeAPI:
                 )
                 return None
 
-        except requests.RequestException as e:
+        except RateLimitExceeded:
+            # Re-raise quota exceptions
+            raise
+        except Exception as e:
             logging.error(f"YouTube request failed: {e}")
             return None
 
     def get_youtube_metrics(self, source_name, url=None):
-        """Get YouTube channel or video metrics"""
+        """Get YouTube channel or video metrics with standardized caching"""
         cache_key = f"{source_name}_{url}".lower()
 
-        # Check cache
-        if cache_key in self.cache:
+        # Use standardized cache checking
+        if self.is_cached(cache_key):
             logging.info(f"YouTube cache hit: {source_name}")
-            return self.cache[cache_key]
+            return self.cache_get(cache_key)
 
+        # Check if API key is available before logging "Fetching"
+        if not self.api_key:
+            logging.debug(f"YouTube API key not configured - skipping {source_name}")
+            empty_result = {}
+            self.cache_set(cache_key, empty_result)
+            return empty_result
+
+        # Only log "Fetching" if we actually have an API key and will make requests
         logging.info(f"Fetching YouTube data for: {source_name}")
+
         metrics = {}
 
-        # Try to find YouTube channel
-        channel_info, lookup_type = self._extract_channel_info(url, source_name)
+        try:
+            # Try to find YouTube channel
+            channel_info, lookup_type = self._extract_channel_info(url, source_name)
 
-        if channel_info:
-            if lookup_type == "id":
-                channel_data = self._get_channel_by_id(channel_info)
-            elif lookup_type == "username":
-                channel_data = self._get_channel_by_username(channel_info)
-            else:  # search
-                channel_data = self._search_channel(channel_info)
+            if channel_info:
+                if lookup_type == "id":
+                    channel_data = self._get_channel_by_id(channel_info)
+                elif lookup_type == "username":
+                    channel_data = self._get_channel_by_username(channel_info)
+                else:  # search
+                    channel_data = self._search_channel(channel_info)
 
-            if channel_data:
-                metrics.update(channel_data)
+                if channel_data:
+                    metrics.update(channel_data)
 
-                # Get recent videos data
-                channel_id = metrics.get("youtube_channel_id")
-                if channel_id:
-                    video_metrics = self._get_recent_videos_metrics(channel_id)
-                    if video_metrics:
-                        metrics.update(video_metrics)
+                    # Get recent videos data
+                    channel_id = metrics.get("youtube_channel_id")
+                    if channel_id:
+                        video_metrics = self._get_recent_videos_metrics(channel_id)
+                        if video_metrics:
+                            metrics.update(video_metrics)
 
-        # Cache results
-        self.cache[cache_key] = metrics
+        except RateLimitExceeded:
+            logging.info(f"YouTube quota exceeded while processing {source_name}")
+            # Return partial results if we got some data, but don't cache to allow retry later
+            return metrics
 
+        # Use standardized cache setting
+        self.cache_set(cache_key, metrics)
         return metrics
 
     def _get_channel_by_id(self, channel_id):
         """Get channel data by channel ID"""
         params = {"part": "snippet,statistics,brandingSettings", "id": channel_id}
 
-        data = self._make_request("channels", params)
-        if not data or "items" not in data or not data["items"]:
+        data = self._make_request("channels", params, call_type="channel_details")
+        if data is None or "items" not in data or not data["items"]:
             return {}
 
         return self._parse_channel_data(data["items"][0])
@@ -156,14 +216,14 @@ class YouTubeAPI:
             "forUsername": username,
         }
 
-        data = self._make_request("channels", params)
-        if not data or "items" not in data or not data["items"]:
+        data = self._make_request("channels", params, call_type="channel_by_username")
+        if data is None or "items" not in data or not data["items"]:
             return {}
 
         return self._parse_channel_data(data["items"][0])
 
     def _search_channel(self, query):
-        """Search for channel by name"""
+        """Search for channel by name - EXPENSIVE OPERATION"""
         params = {
             "part": "snippet",
             "q": query,
@@ -172,8 +232,8 @@ class YouTubeAPI:
             "order": "relevance",
         }
 
-        data = self._make_request("search", params)
-        if not data or "items" not in data or not data["items"]:
+        data = self._make_request("search", params, call_type="search")
+        if data is None or "items" not in data or not data["items"]:
             return {}
 
         # Get the first channel result
@@ -273,14 +333,18 @@ class YouTubeAPI:
             "type": "video",
         }
 
-        search_data = self._make_request("search", params)
-        if not search_data or "items" not in search_data:
+        search_data = self._make_request("search", params, call_type="video_list")
+        if (
+            search_data is None
+            or "items" not in search_data
+            or not search_data["items"]
+        ):
             return {}
 
         video_ids = [
             item["id"]["videoId"]
             for item in search_data["items"]
-            if "videoId" in item["id"]
+            if "id" in item and "videoId" in item["id"]
         ]
 
         if not video_ids:
@@ -289,8 +353,12 @@ class YouTubeAPI:
         # Get detailed video statistics
         params = {"part": "statistics,snippet", "id": ",".join(video_ids)}
 
-        videos_data = self._make_request("videos", params)
-        if not videos_data or "items" not in videos_data:
+        videos_data = self._make_request("videos", params, call_type="video_details")
+        if (
+            videos_data is None
+            or "items" not in videos_data
+            or not videos_data["items"]
+        ):
             return {}
 
         # Calculate aggregate metrics
@@ -332,36 +400,3 @@ class YouTubeAPI:
                     metrics["youtube_engagement_score"] = 20
 
         return metrics
-
-    def is_enabled(self):
-        """Check if API is properly configured"""
-        return bool(self.api_key)
-
-    def get_supported_media_types(self):
-        """Return supported media types"""
-        return ["TV/Video", "Podcast/Audio"]  # Some podcasts also have YouTube channels
-
-
-# Example usage:
-if __name__ == "__main__":
-    # Set your API key as environment variable: YOUTUBE_API_KEY
-    api = YouTubeAPI()
-
-    if api.is_enabled():
-        # Test with sample channels
-        test_sources = [
-            ("CNN", "https://www.youtube.com/user/CNN"),
-            ("Fox News", "https://www.youtube.com/user/FoxNewsChannel"),
-            (
-                "The Joe Rogan Experience",
-                "https://www.youtube.com/channel/UCzQUP1qoWDoEbmsQxvdjxgQ",
-            ),
-        ]
-
-        for name, url in test_sources:
-            print(f"\n=== {name} ===")
-            metrics = api.get_youtube_metrics(name, url)
-            for key, value in metrics.items():
-                print(f"  {key}: {value}")
-    else:
-        print("YouTube API key not configured")

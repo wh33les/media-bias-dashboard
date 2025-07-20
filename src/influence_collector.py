@@ -1,10 +1,8 @@
 # influence_collector.py
 """
-Multi-Medium Influence Collector (Simplified Configurable Version)
+Multi-Medium Influence Collector with Standardized API Management
 Works reliably for Web Articles, TV Shows, AND Podcasts
-SAVES PROGRESS TO DISK - can resume if interrupted!
-
-Simple configuration via config.py file
+Features consistent quota tracking across all APIs
 """
 
 import pandas as pd
@@ -49,7 +47,7 @@ class RobustInfluenceCollector:
 
         logging.info(f"Enabled scorers and weights: {self.enabled_scorers}")
 
-        # Create cache managers for each enabled API (appears in later conditionals)
+        # Create standardized API managers for each enabled API
         self.api_managers = {}
 
         # Initialize session only if we have APIs that make HTTP requests
@@ -70,35 +68,49 @@ class RobustInfluenceCollector:
                 "No API clients enabled - skipping HTTP session and cache management setup"
             )
 
-        # Conditionally import and initialize APIs with their cache managers
+        # Initialize APIs with standardized quota management
         if "wikipedia" in self.enabled_scorers:
             from apis.wikipedia_api import WikipediaAPI
 
-            # Create dedicated cache manager for Wikipedia
-            self.api_managers["wikipedia"] = APIManager("Wikipedia")
-            self.wikipedia_api = WikipediaAPI(
-                api_manager=self.api_managers["wikipedia"]
+            # Wikipedia is rate-limited, not quota-based
+            self.api_managers["wikipedia"] = APIManager(
+                "Wikipedia",
+                daily_quota_limit=None,  # No daily quota
+                hourly_limit=200,  # Rate limited instead
             )
-            logging.info("Wikipedia API initialized")
+            self.wikipedia_api = WikipediaAPI(
+                session=self.session, api_manager=self.api_managers["wikipedia"]
+            )
+            logging.info("Wikipedia API initialized with rate limiting")
 
         if "youtube" in self.enabled_scorers:
             from apis.youtube_api import YouTubeAPI
 
-            # Create dedicated cache manager for YouTube
-            self.api_managers["youtube"] = APIManager("YouTube")
-            self.youtube_api = YouTubeAPI(api_manager=self.api_managers["youtube"])
-            logging.info("YouTube API initialized")
+            # YouTube is quota-based (10,000 units per day)
+            self.api_managers["youtube"] = APIManager(
+                "YouTube",
+                daily_quota_limit=10000,  # YouTube's daily quota
+                hourly_limit=None,  # No hourly limit
+            )
+            self.youtube_api = YouTubeAPI(
+                session=self.session, api_manager=self.api_managers["youtube"]
+            )
+            logging.info("YouTube API initialized with quota tracking")
 
         if "similarweb" in self.enabled_scorers:
-            # TODO: Implement SimilarWeb API
-            self.api_managers["similarweb"] = APIManager("SimilarWeb")
-            # self.similarweb_api = SimilarWebAPI(cache_manager=self.api_managers["similarweb"])
+            # TODO: Implement SimilarWeb API with appropriate limits
+            self.api_managers["similarweb"] = APIManager(
+                "SimilarWeb", daily_quota_limit=1000, hourly_limit=100  # Example quota
+            )
             logging.info("SimilarWeb API enabled but not yet implemented")
 
         if "listen_notes" in self.enabled_scorers:
-            # TODO: Implement Listen Notes API
-            self.api_managers["listen_notes"] = APIManager("Listen Notes")
-            # self.listen_notes_api = ListenNotesAPI(cache_manager=self.api_managers["listen_notes"])
+            # TODO: Implement Listen Notes API with appropriate limits
+            self.api_managers["listen_notes"] = APIManager(
+                "Listen Notes",
+                daily_quota_limit=10000,  # Example quota
+                hourly_limit=1000,
+            )
             logging.info("Listen Notes API enabled but not yet implemented")
 
     def get_source_prominence_score(self, source_name):
@@ -136,11 +148,12 @@ class RobustInfluenceCollector:
             wikipedia_weight = self.enabled_scorers["wikipedia"] / 100
             final_score += wiki_score * wikipedia_weight
 
+        if "youtube" in self.enabled_scorers:
+            youtube_score = all_metrics.get("youtube_subscriber_score", 0)
+            youtube_weight = self.enabled_scorers["youtube"] / 100
+            final_score += youtube_score * youtube_weight
+
         # TODO: Add other scorer scores when implemented
-        # if "youtube" in self.enabled_scorers:
-        #     youtube_score = all_metrics.get("youtube_score", 0)
-        #     youtube_weight = self.enabled_scorers["youtube"] / 100
-        #     final_score += (youtube_score / 100) * youtube_weight
 
         return min(100, final_score)
 
@@ -163,14 +176,18 @@ class RobustInfluenceCollector:
 
         if "youtube" in self.enabled_scorers:
             columns.extend(
-                ["youtube_subscriber_count", "youtube_view_count", "youtube_score"]
+                [
+                    "youtube_subscriber_count",
+                    "youtube_subscribers",
+                    "youtube_subscriber_score",
+                ]
             )
 
         # Add other scorer columns as needed...
         return columns
 
     def process_all_media_types(self, df):
-        """Process all sources"""
+        """Process all sources with standardized API management"""
         # Get dynamic columns based on enabled scorers
         new_columns = self.get_required_columns()
         new_cols_dict = {col: None for col in new_columns if col not in df.columns}
@@ -209,11 +226,14 @@ class RobustInfluenceCollector:
                 # Handle rate limit exceptions from any API
                 if self.RateLimitExceeded and isinstance(e, self.RateLimitExceeded):
                     print(
-                        f"Rate limit reached. Processed {idx} sources. Run again to continue."
+                        f"Rate/quota limit reached at source {idx+1}. Processed {idx} sources. Run again to continue."
                     )
 
                     # Save all caches when any API hits rate limit
                     self.save_all_caches_to_disk()
+
+                    # Show quota summary before stopping
+                    self.show_quota_summary()
                     break
                 raise
 
@@ -263,7 +283,7 @@ class RobustInfluenceCollector:
             numeric_columns.extend(["wikipedia_score", "wikipedia_avg_daily_views"])
 
         if "youtube" in self.enabled_scorers:
-            numeric_columns.extend(["youtube_subscribers", "youtube_score"])
+            numeric_columns.extend(["youtube_subscribers", "youtube_subscriber_score"])
 
         # Add other APIs as needed
         return numeric_columns
@@ -278,8 +298,41 @@ class RobustInfluenceCollector:
             api_manager.save_cache_to_disk()
             logging.debug(f"Saved {api_name} cache")
 
+    def show_quota_summary(self):
+        """Show detailed quota usage summary for all APIs"""
+        if not self.api_managers:
+            return
+
+        print(f"\n" + "=" * 60)
+        print("API QUOTA/RATE USAGE SUMMARY")
+        print("=" * 60)
+
+        for api_name, api_manager in self.api_managers.items():
+            summary = api_manager.get_usage_summary()
+
+            print(f"\n{summary['api_name']}:")
+            if summary["type"] == "quota":
+                usage_pct = summary["usage_percent"]
+                status_text = (
+                    "CRITICAL"
+                    if summary["status"] == "critical"
+                    else "WARNING" if summary["status"] == "warning" else "OK"
+                )
+                print(f"  Status: {status_text}")
+                print(
+                    f"  Quota: {summary['quota_used']:,}/{summary['quota_limit']:,} units ({usage_pct:.1f}%)"
+                )
+                print(f"  API Calls: {summary['calls']}")
+                remaining = summary["quota_limit"] - summary["quota_used"]
+                print(f"  Remaining: {remaining:,} units")
+            else:
+                print(f"  API Calls: {summary['calls']}")
+                print(
+                    f"  Rate: {summary['rate']:.1f} calls/hour (limit: {summary['rate_limit']})"
+                )
+
     def show_summary(self, df):
-        """Show results summary"""
+        """Show results summary with quota information"""
         print("\n" + "=" * 60)
         print("MULTI-MEDIUM INFLUENCE ANALYSIS RESULTS")
         print("=" * 60)
@@ -288,38 +341,8 @@ class RobustInfluenceCollector:
         processed = df["robust_influence_score"].notna().sum()
         print(f"Processed: {processed}/{total_sources} sources")
 
-        # Add detailed API call information - efficient version:
-        if self.api_managers:
-            # Quick check without detailed processing
-            total_calls = sum(mgr.api_call_count for mgr in self.api_managers.values())
-
-            if total_calls > 0:
-                # Get detailed info (earliest_start, api_details) without recalculating total_calls
-                _, earliest_start, api_details = self._get_api_stats()
-                print(f"Total API calls made: {total_calls}")
-
-                if earliest_start is not None:
-                    elapsed_hours = (
-                        datetime.now() - earliest_start
-                    ).total_seconds() / 3600
-                    print(f"Runtime: {elapsed_hours:.2f} hours")
-
-                # Show per-API breakdown
-                if api_details:
-                    print("API breakdown:")
-                    for detail in api_details:
-                        print(f"  - {detail}")
-            else:
-                # APIs enabled but no calls made (all cache hits)
-                print(f"Total API calls made: 0 (all data served from cache)")
-                print("Enabled APIs:")
-                for api_name, mgr in self.api_managers.items():
-                    cache_entries = len(mgr.cache_data)
-                    print(f"  - {api_name}: {cache_entries} cached entries")
-        else:
-            # No APIs enabled at all (heuristics only)
-            print(f"Total API calls made: 0 (heuristics-only processing)")
-            print(f"Enabled scorers: {', '.join(self.enabled_scorers.keys())}")
+        # Show quota summary
+        self.show_quota_summary()
 
         # Top 10 overall
         print(f"\nTOP INFLUENCE SCORES:")
@@ -330,30 +353,10 @@ class RobustInfluenceCollector:
                 score = row["robust_influence_score"]
                 media_type = row["Mediatype"]
                 wiki = "[WIKI]" if row.get("has_wikipedia_page") else ""
+                youtube = "[YT]" if row.get("youtube_subscribers", 0) > 0 else ""
                 print(
-                    f"{i:2}. {row['Moniker'][:35]}... ({score:.1f}) [{media_type}] {wiki}"
+                    f"{i:2}. {row['Moniker'][:35]}... ({score:.1f}) [{media_type}] {wiki} {youtube}"
                 )
-
-    def _get_api_stats(self):
-        """Get aggregated API statistics from all enabled APIs"""
-        total_calls = 0
-        earliest_start = None
-        api_details = []
-
-        for api_name, api_manager in self.api_managers.items():
-            calls = api_manager.api_call_count
-            total_calls += calls
-
-            if calls > 0:  # Only include APIs that were actually used
-                api_details.append(f"{api_name}: {calls} calls")
-
-                if (
-                    earliest_start is None
-                    or api_manager.session_start_time < earliest_start
-                ):
-                    earliest_start = api_manager.session_start_time
-
-        return total_calls, earliest_start, api_details
 
 
 def main():

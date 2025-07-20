@@ -1,47 +1,68 @@
 #!/usr/bin/env python3
 """
-Wikipedia API module for collecting pageview data and interest scores
+Wikipedia API module using standardized BaseAPI
+Collects pageview data and interest scores with consistent quota tracking
 """
 
-import requests
 import logging
-from urllib.parse import quote
 import re
+from urllib.parse import quote
 
 import config
-from .api_manager import APIManager, RateLimitExceeded
+from .base_api import BaseAPI
+from .api_manager import RateLimitExceeded
 
 
-class WikipediaAPI:
+class WikipediaAPI(BaseAPI):
+    """Wikipedia API with standardized quota tracking interface"""
+
     def __init__(self, session=None, api_manager=None):
-        # Use provided session or create new one
-        if session:
-            self.session = session
-        else:
-            self.session = requests.Session()
-            self.session.headers.update({"User-Agent": config.user_agent})
+        # Call parent constructor for common setup
+        super().__init__("Wikipedia", session=session, api_manager=api_manager)
 
-        if api_manager is None:
-            raise ValueError("api_manager is required for WikipediaAPI")
-        self.api_manager = api_manager
+    def _define_api_costs(self):
+        """
+        Wikipedia API cost structure
+        Wikipedia doesn't have quotas, so all calls cost 1 "unit" for rate limiting
+        """
+        return {
+            "summary": 1,  # Page summary lookup
+            "pageviews": 1,  # Pageview statistics
+            "search": 1,  # Any search operation
+            "standard": 1,  # Default cost
+        }
+
+    def is_enabled(self):
+        """Wikipedia API is always enabled (no API key required)"""
+        return True
+
+    def get_supported_media_types(self):
+        """Return supported media types"""
+        return [
+            "Web/Articles",
+            "TV/Video",
+            "Podcast/Audio",
+        ]  # Wikipedia covers all types
 
     def _clean_search_term(self, term):
-        """Clean search term"""
+        """Clean search term for Wikipedia lookup"""
         clean = re.sub(r"\s*\([^)]+\)$", "", term)  # Remove (parentheses)
         clean = re.sub(r":\s*.*$", "", clean)  # Remove : suffixes
         return clean.strip()
 
     def get_wikipedia_pageviews(self, source_name, media_type):
-        """Get Wikipedia pageviews with caching"""
+        """Get Wikipedia pageviews with standardized caching and logging"""
         # Clean the source name first
         clean_source_name = source_name.strip()
         cache_key = f"{clean_source_name}_{media_type}"
 
-        if self.api_manager.is_in_cache(cache_key):
+        # Use standardized cache checking
+        if self.is_cached(cache_key):
             logging.info(f"Wikipedia cache HIT: {clean_source_name}")
-            return self.api_manager.get_from_cache(cache_key)
+            return self.cache_get(cache_key)
 
-        if self.api_manager.is_rate_limit_exceeded():
+        # Use standardized quota checking
+        if self.check_quota_limit("search"):
             raise RateLimitExceeded("Wikipedia API rate limit reached")
 
         logging.info(f"Wikipedia cache MISS: fetching {clean_source_name}")
@@ -61,15 +82,22 @@ class WikipediaAPI:
             elif media_type == "Web/Articles":
                 search_terms.extend([f"{base_name} (website)", f"{base_name}.com"])
 
-            for term in search_terms:
+            # Remove duplicates while preserving order
+            unique_search_terms = list(dict.fromkeys(search_terms))
+
+            logging.debug(
+                f"Search terms for '{clean_source_name}': {unique_search_terms}"
+            )
+
+            for term in unique_search_terms:
                 try:
                     search_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{quote(term)}"
                     response = self.session.get(
                         search_url, timeout=config.timeout_seconds
                     )
 
-                    # Use the API manager logging method:
-                    self.api_manager.log_api_call(f"Wikipedia summary for '{term}'")
+                    # Use standardized logging
+                    self.log_api_call(f"Summary for '{term}'", call_type="summary")
 
                     if response.status_code == 200:
                         data = response.json()
@@ -82,9 +110,9 @@ class WikipediaAPI:
                                 pageviews_url, timeout=config.timeout_seconds
                             )
 
-                            # Use the API manager logging method:
-                            self.api_manager.log_api_call(
-                                f"Wikipedia pageviews for '{page_title}'"
+                            # Use standardized logging
+                            self.log_api_call(
+                                f"Pageviews for '{page_title}'", call_type="pageviews"
                             )
 
                             if pv_response.status_code == 200:
@@ -110,9 +138,9 @@ class WikipediaAPI:
                                     logging.info(
                                         f"Found Wikipedia page: {page_title} ({avg_daily_views:.0f} daily views)"
                                     )
-                                    break
+                                    break  # Stop after first successful match
 
-                except requests.RequestException as e:
+                except Exception as e:
                     logging.debug(f"Network error for '{term}': {e}")
                     continue
 
@@ -120,6 +148,7 @@ class WikipediaAPI:
             logging.debug(f"Wikipedia error for {clean_source_name}: {e}")
 
         finally:
-            self.api_manager.add_to_cache(cache_key, result)
+            # Use standardized cache setting
+            self.cache_set(cache_key, result)
 
         return result

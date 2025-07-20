@@ -1,20 +1,20 @@
-Moniker,Main Url,Bias,Reliability,Mediatype,robust_influence_score,source_prominence_score,has_wikipedia_page,wikipedia_title,wikipedia_avg_daily_views,wikipedia_score
-ABC News (website),https://abcnews.go.com/,-3.02,44.77,Web/Articles,27.0,90.0,False,,,0.0
-BBC,https://www.bbc.com/,-1.34,44.73,Web/Articles,67.51,90.0,True,BBC,5787.0,57.87491803278688
-CNN (website),https://www.cnn.com/,-6.19,42.13,Web/Articles,45.48,90.0,True,CNN,2639.0,26.39308743169399
-Fox News (website),http://foxnews.com/,11.06,35.31,Web/Articles,44.45,90.0,True,Fox News,2493.0,24.931147540983606
-NPR (website),https://www.npr.org/,-4.23,43.1,Web/Articles,,,,,,
-Reuters,https://www.reuters.com/,-1.25,44.98,Web/Articles,,,,,,
-11Alive Atlanta NBC WXIA,http://11alive.com,-3.86,45.75,Web/Articles,,,,,,
-Activist Post,http://activistpost.com,16.32,17.81,Web/Articles,,,,,,
-Advocate Magazine,http://advocate.com,-12.21,40.0,Web/Articles,,,,,,
-Agence France-Presse,https://www.afp.com/en,-2.4,47.15,Web/Articles,,,,,,
-Air Force Times,http://airforcetimes.com,1.18,46.01,Web/Articles,,,,,,
-Al Jazeera (website),https://www.aljazeera.com,-7.27,41.28,Web/Articles,,,,,,
-ABC: World News Tonight with David Muir,https://abcnews.go.com/WN,-5.82,47.08,TV/Video,,,,,,
-CBS: 60 Minutes,https://www.cbs.com/shows/60_minutes/,-9.55,34.19,TV/Video,,,,,,
-CNN: Anderson Cooper 360,https://www.cnn.com/shows/ac-360,-14.65,33.76,TV/Video,,,,,,
-CNN: The Situation Room,https://www.cnn.com/shows/situation-room,-11.19,42.0,TV/Video,,,,,,
-"All In Podcast (All-In with Chamath, Jason, Sacks & Friedberg)",https://allinchamathjason.libsyn.com/website,4.5,38.27,Podcast/Audio,,,,,,
-Chapo Trap House,https://soundcloud.com/chapo-trap-house,-28.83,20.87,Podcast/Audio,,,,,,
-Louder With Crowder,http://louderwithcrowder.com,29.71,10.19,Podcast/Audio,,,,,,
+Moniker,Main Url,Bias,Reliability,Mediatype,robust_influence_score,source_prominence_score,has_wikipedia_page,wikipedia_title,wikipedia_avg_daily_views,wikipedia_score,youtube_channel_id,youtube_channel_title,youtube_subscribers,youtube_subscriber_score,youtube_video_count,youtube_total_views,youtube_engagement_rate,youtube_score
+ABC News (website),https://abcnews.go.com/,-3.02,44.77,Web/Articles,49.0,90,False,,,0.0,UCBi2mrWuNuyYy4gbM6fU18Q,ABC News,18800000.0,100.0,102956.0,16888572691.0,0.807,100
+BBC,https://www.bbc.com/,-1.34,44.73,Web/Articles,77.94,90,True,BBC,5787.0,57.87491803278688,UC16niRr50-MSBwiO3YDb3RA,BBC News,18500000.0,100.0,26180.0,6257872107.0,1.601,100
+CNN (website),https://www.cnn.com/,-6.19,42.13,Web/Articles,62.2,90,True,CNN,2639.0,26.39308743169399,UCupvZG-5ko_eiXAupbDfxWw,CNN,18400000.0,100.0,173691.0,18467733469.0,3.012,100
+Fox News (website),http://foxnews.com/,11.06,35.31,Web/Articles,61.47,90,True,Fox News,2493.0,24.931147540983606,UCXIJgqnII2ZOINSWNOGFThA,Fox News,14100000.0,100.0,123000.0,21456018303.0,4.165,100
+NPR (website),https://www.npr.org/,-4.23,43.1,Web/Articles,54.81,90,True,NPR,1161.0,11.611065573770492,UC4eYXhJI4-7wSWc8UNRwD4A,NPR Music,11500000.0,100.0,2773.0,3900279958.0,8.157,100
+Reuters,https://www.reuters.com/,-1.25,44.98,Web/Articles,48.13,90,True,Reuters,1426.0,14.262431693989072,UChqUTb7kYRX8-EiaN3XFrSQ,Reuters,3840000.0,80.0,67116.0,2036783501.0,1.209,80
+11Alive Atlanta NBC WXIA,http://11alive.com,-3.86,45.75,Web/Articles,41.0,90,False,,,0.0,UCzF4Ryn8TKn64md77gS5Q5Q,11Alive,2520000.0,80.0,131401.0,1536494900.0,0.943,80
+Activist Post,http://activistpost.com,16.32,17.81,Web/Articles,27.0,30,False,,,0.0,UCo9Yo2qEvzhn7r-Q07reJrA,Good Guy Activism,111000.0,60.0,1696.0,43924104.0,8.457,60
+Advocate Magazine,http://advocate.com,-12.21,40.0,Web/Articles,7.0,30,False,,,0.0,UCLmca4y-2v6v-dNMSHw3HdA,iOnly Magazine Official,0.0,10.0,3.0,42.0,0.0,10
+Agence France-Presse,https://www.afp.com/en,-2.4,47.15,Web/Articles,36.47,30,True,Agence France-Presse,293.0,2.9315027322404372,UCckz6n8QccTd6K_xdwKqa0A,AFP,1750000.0,80.0,116064.0,798420030.0,0.884,80
+Air Force Times,http://airforcetimes.com,1.18,46.01,Web/Articles,7.02,30,True,Air Force Times,5.0,0.04669398907103825,UC-Y6mkwXoGUn_IDNyhFdjfw,air force time,0.0,10.0,1.0,67.0,,10
+Al Jazeera (website),https://www.aljazeera.com,-7.27,41.28,Web/Articles,10.89,30,True,Al Jazeera Media Network,1578.0,15.784043715846995,,,,,,,,0
+ABC: World News Tonight with David Muir,https://abcnews.go.com/WN,-5.82,47.08,TV/Video,9.0,90,False,,,0.0,,,,,,,,0
+CBS: 60 Minutes,https://www.cbs.com/shows/60_minutes/,-9.55,34.19,TV/Video,20.33,90,True,CBS,2265.0,22.653360655737707,,,,,,,,0
+CNN: Anderson Cooper 360,https://www.cnn.com/shows/ac-360,-14.65,33.76,TV/Video,22.2,90,True,CNN,2639.0,26.39308743169399,,,,,,,,0
+CNN: The Situation Room,https://www.cnn.com/shows/situation-room,-11.19,42.0,TV/Video,22.2,90,True,CNN,2639.0,26.39308743169399,,,,,,,,0
+"All In Podcast (All-In with Chamath, Jason, Sacks & Friedberg)",https://allinchamathjason.libsyn.com/website,4.5,38.27,Podcast/Audio,5.0,50,False,,,0.0,,,,,,,,0
+Chapo Trap House,https://soundcloud.com/chapo-trap-house,-28.83,20.87,Podcast/Audio,6.53,30,True,Chapo Trap House,707.0,7.067240437158469,,,,,,,,0
+Louder With Crowder,http://louderwithcrowder.com,29.71,10.19,Podcast/Audio,3.0,30,False,,,0.0,,,,,,,,0
