@@ -8,11 +8,11 @@ Supports both quota-based APIs (YouTube) and rate-limited APIs (Wikipedia)
 log_level = "INFO"  # Set to INFO to see quota tracking
 
 # File paths
-input_file = "data/test_data.csv"
-output_file = "data/test_results.csv"
+input_file = "tests/test_data.csv"
+output_file = "tests/test_results.csv"
 
 # Cache settings
-cache_dir = "cache_files"
+cache_dir = "tests/cache_files"
 save_frequency = 10  # Save progress every N items
 
 # Scorers configuration (scores should add up to 100)
