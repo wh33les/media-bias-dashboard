@@ -4,9 +4,12 @@ Configuration settings for the influence collector
 Simple Python config - easy to modify and can include comments
 """
 
+# Logging level: "DEBUG", "INFO", "WARNING", "ERROR"
+log_level = "INFO"  # Quiet by default
+
 # File paths
-input_file = "data/requested_data.csv"
-output_file = "data/final_tableau_data.csv"
+input_file = "data/test_data.csv"
+output_file = "data/test_results.csv"
 
 # Cache settings
 cache_dir = "cache_files"
@@ -17,23 +20,37 @@ user_agent = "media-bias-dashboard/1.0 (https://github.com/wh33les/data-visualiz
 timeout_seconds = 5
 request_delay = 0.1  # Seconds between requests
 
-# Rate limiting
-wikipedia_hourly_limit = 500
+# Heurestics and APIs (scores should add up to 100)
+scorers_config = {
+    "heuristics": 30,  # Heuristics for all media types (default)
+    "wikipedia": 70,  # Influence for all media types (free)
+    "youtube": 0,  # YouTube channels (free but needs a key, https://console.cloud.google.com/))
+    "similarweb": 0,  # Websites (paid, https://account.similarweb.com/)
+    "listen_notes": 0,  # Podcast data (paid, https://www.listennotes.com/api/)
+}
+
+# API cache filenames
+api_cache_files = {
+    "wikipedia": "wikipedia_cache.pkl",
+    "youtube": "youtube_cache.pkl",
+    "similarweb": "similarweb_cache.pkl",
+    "listen_notes": "listen_notes_cache.pkl",
+}
+
+# API rate limits (calls per hour)
+api_rate_limits = {
+    "wikipedia": 500,
+    "youtube": 10000,
+    "similarweb": 100,
+    "listen_notes": 1000,
+}
+
 warning_threshold = 0.8  # Warn at 80% of limit
 stop_threshold = 0.9  # Stop at 90% of limit
 
-# Scoring weights (must sum to 100)
-wikipedia_weight = 70
-prominence_weight = 30
-
+# Heuristics config
 # Scoring defaults
-tier1_score = 90
-tier2_score = 70
-tier3_score = 50
-unknown_source_score = 30
-
-# Logging level: "DEBUG", "INFO", "WARNING", "ERROR"
-log_level = "INFO"  # Quiet by default
+prominence_scores = {"tier1": 90, "tier2": 70, "tier3": 50, "unknown": 30}
 
 # Source prominence tiers
 tier1_domains = [

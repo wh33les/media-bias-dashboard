@@ -1,6 +1,7 @@
 media-bias-dashboard.code-workspace
 __pycache__
 .venv
+.env
 
 # Tableau temp files
 ~*.twbr

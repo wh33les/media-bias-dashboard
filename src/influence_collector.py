@@ -12,25 +12,16 @@ import pandas as pd
 import requests
 import time
 import logging
-from urllib.parse import quote
-import re
-import pickle
 import os
 from datetime import datetime
 
-# Import configuration
+# Import configuration and base exception
 import config
-
-
-class RateLimitExceeded(Exception):
-    """Raised when API rate limits are exceeded"""
-
-    pass
 
 
 class RobustInfluenceCollector:
     def __init__(self):
-        # Setup logging level from config
+        # Setup logging level from config FIRST
         log_levels = {
             "DEBUG": logging.DEBUG,
             "INFO": logging.INFO,
@@ -39,198 +30,83 @@ class RobustInfluenceCollector:
         }
         logging.basicConfig(
             level=log_levels.get(config.log_level, logging.WARNING),
-            format="%(levelname)s: %(message)s",
+            format="%(filename)s: %(levelname)s: %(message)s",
         )
 
-        # Initialize session
-        self.session = requests.Session()
-        self.session.headers.update({"User-Agent": config.user_agent})
+        # Filter enabled scorers (non-zero weights)
+        self.enabled_scorers = {k: v for k, v in config.scorers_config.items() if v > 0}
 
-        # Setup cache (Wikipedia only)
-        os.makedirs(config.cache_dir, exist_ok=True)
-        self.wikipedia_cache_file = os.path.join(
-            config.cache_dir, "wikipedia_cache.pkl"
-        )
-
-        self.wikipedia_cache = self._load_cache(self.wikipedia_cache_file)
-
-        # Track API calls
-        self.api_call_count = 0
-        self.session_start_time = datetime.now()
-
-        logging.info(f"Cache: {len(self.wikipedia_cache)} Wikipedia entries")
-
-    def _load_cache(self, cache_file):
-        """Load cache from disk"""
-        try:
-            if os.path.exists(cache_file):
-                with open(cache_file, "rb") as f:
-                    return pickle.load(f)
-        except Exception as e:
-            logging.warning(f"Could not load {cache_file}: {e}")
-        return {}
-
-    def _save_cache(self, cache_data, cache_file):
-        """Save cache to disk"""
-        try:
-            with open(cache_file, "wb") as f:
-                pickle.dump(cache_data, f)
-            logging.debug(f"Saved {len(cache_data)} entries to {cache_file}")
-        except Exception as e:
-            logging.error(f"Could not save {cache_file}: {e}")
-
-    def _log_api_call(self, description=""):
-        """Log API call with current count and rate"""
-        self.api_call_count += 1
-        elapsed_hours = (
-            datetime.now() - self.session_start_time
-        ).total_seconds() / 3600
-
-        if elapsed_hours >= 1.0:
-            calls_per_hour = self.api_call_count / elapsed_hours
-            logging.info(
-                f"API Call #{self.api_call_count}: {description} (Rate: {calls_per_hour:.0f}/hour)"
+        # Validate scorer configuration weights
+        total_weight = sum(self.enabled_scorers.values())
+        if total_weight != 100:
+            raise ValueError(
+                f"Enabled scorer weights must sum to 100, got {total_weight}. Change in config.py."
             )
+
+        # Validate prominence scores (always check, even if not used)
+        max_score = max(config.prominence_scores.values())
+        if max_score > 100:
+            raise ValueError(f"Prominence scores cannot exceed 100, found {max_score}")
+
+        logging.info(f"Enabled scorers and weights: {self.enabled_scorers}")
+
+        # Initialize session only if we have APIs that make HTTP requests
+        api_clients_enabled = {
+            k: v for k, v in self.enabled_scorers.items() if k != "heuristics"
+        }
+
+        if api_clients_enabled:
+            # Import APIManager only when APIs are actually enabled
+            from apis.api_manager import APIManager, RateLimitExceeded
+
+            self.RateLimitExceeded = RateLimitExceeded
+
+            self.session = requests.Session()
+            self.session.headers.update({"User-Agent": config.user_agent})
+            logging.info("HTTP session initialized for API clients")
+
+            # Create cache managers for each enabled API
+            self.api_managers = {}
+
         else:
-            logging.info(f"API Call #{self.api_call_count}: {description}")
+            # No APIs enabled - don't import APIManager at all
+            self.RateLimitExceeded = None
+            self.session = None
+            self.api_managers = {}
+            logging.info(
+                "No API clients enabled - skipping HTTP session and cache management setup"
+            )
 
-    def _is_rate_limit_exceeded(self):
-        """Check rate limits"""
-        elapsed_hours = (
-            datetime.now() - self.session_start_time
-        ).total_seconds() / 3600
+        # Conditionally import and initialize APIs with their cache managers
+        if "wikipedia" in self.enabled_scorers:
+            from apis.wikipedia_api import WikipediaAPI
 
-        # Simple logic: if less than 1 hour, just check total calls
-        if elapsed_hours < 1.0:
-            warning_threshold = config.wikipedia_hourly_limit * config.warning_threshold
-            stop_threshold = config.wikipedia_hourly_limit * config.stop_threshold
+            # Create dedicated cache manager for Wikipedia
+            self.api_managers["wikipedia"] = APIManager("Wikipedia")
+            self.wikipedia_api = WikipediaAPI(
+                api_manager=self.api_managers["wikipedia"]
+            )
+            logging.info("Wikipedia API initialized")
 
-            if self.api_call_count > warning_threshold:
-                logging.warning(
-                    f"High API usage: {self.api_call_count} calls in {elapsed_hours:.2f} hours (warning at {warning_threshold})"
-                )
+        if "youtube" in self.enabled_scorers:
+            from apis.youtube_api import YouTubeAPI
 
-            if self.api_call_count > stop_threshold:
-                logging.error("Approaching rate limit! Saving progress...")
-                self._save_cache(self.wikipedia_cache, self.wikipedia_cache_file)
-                return True
-        else:
-            # After 1 hour, use calls per hour calculation
-            calls_per_hour = self.api_call_count / elapsed_hours
-            warning_threshold = config.wikipedia_hourly_limit * config.warning_threshold
-            stop_threshold = config.wikipedia_hourly_limit * config.stop_threshold
+            # Create dedicated cache manager for YouTube
+            self.api_managers["youtube"] = APIManager("YouTube")
+            self.youtube_api = YouTubeAPI(api_manager=self.api_managers["youtube"])
+            logging.info("YouTube API initialized")
 
-            if calls_per_hour > warning_threshold:
-                logging.warning(
-                    f"High API usage: {calls_per_hour:.0f} calls/hour (limit: {config.wikipedia_hourly_limit})"
-                )
+        if "similarweb" in self.enabled_scorers:
+            # TODO: Implement SimilarWeb API
+            self.api_managers["similarweb"] = APIManager("SimilarWeb")
+            # self.similarweb_api = SimilarWebAPI(cache_manager=self.api_managers["similarweb"])
+            logging.info("SimilarWeb API enabled but not yet implemented")
 
-            if calls_per_hour > stop_threshold:
-                logging.error("Approaching rate limit! Saving progress...")
-                self._save_cache(self.wikipedia_cache, self.wikipedia_cache_file)
-                return True
-
-        return False
-
-    def get_wikipedia_pageviews(self, source_name, media_type):
-        """Get Wikipedia pageviews with caching"""
-        # Clean the source name first
-        clean_source_name = source_name.strip()
-        cache_key = f"{clean_source_name}_{media_type}"
-
-        if cache_key in self.wikipedia_cache:
-            logging.info(f"Wikipedia cache HIT: {clean_source_name}")
-            return self.wikipedia_cache[cache_key]
-
-        if self._is_rate_limit_exceeded():
-            raise RateLimitExceeded("Wikipedia API rate limit reached")
-
-        logging.info(f"Wikipedia cache MISS: fetching {clean_source_name}")
-        result = {"has_wikipedia_page": False, "wikipedia_interest_score": 0}
-
-        try:
-            base_name = self._clean_search_term(clean_source_name)
-            search_terms = [clean_source_name, base_name]
-
-            # Add media-specific variations
-            if media_type == "TV/Video":
-                search_terms.extend(
-                    [f"{base_name} (TV program)", f"{base_name} (TV show)"]
-                )
-            elif media_type == "Podcast/Audio":
-                search_terms.extend([f"{base_name} (podcast)", f"{base_name} podcast"])
-            elif media_type == "Web/Articles":
-                search_terms.extend([f"{base_name} (website)", f"{base_name}.com"])
-
-            for term in search_terms:
-                try:
-                    search_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{quote(term)}"
-                    response = self.session.get(
-                        search_url, timeout=config.timeout_seconds
-                    )
-
-                    # Use the new logging method:
-                    self._log_api_call(f"Wikipedia summary for '{term}'")
-
-                    if response.status_code == 200:
-                        data = response.json()
-                        if data.get("type") == "standard":
-                            # Get pageviews
-                            page_title = data.get("title")
-                            pageviews_url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/user/{quote(page_title)}/daily/20240101/20241231"
-
-                            pv_response = self.session.get(
-                                pageviews_url, timeout=config.timeout_seconds
-                            )
-
-                            # Use the new logging method:
-                            self._log_api_call(
-                                f"Wikipedia pageviews for '{page_title}'"
-                            )
-
-                            if pv_response.status_code == 200:
-                                pv_data = pv_response.json()
-                                if pv_data.get("items"):
-                                    total_views = sum(
-                                        item["views"] for item in pv_data["items"]
-                                    )
-                                    avg_daily_views = total_views / len(
-                                        pv_data["items"]
-                                    )
-
-                                    result = {
-                                        "has_wikipedia_page": True,
-                                        "wikipedia_title": page_title,
-                                        "wikipedia_avg_daily_views": round(
-                                            avg_daily_views
-                                        ),
-                                        "wikipedia_interest_score": min(
-                                            100, avg_daily_views / 100
-                                        ),
-                                    }
-                                    logging.info(
-                                        f"Found Wikipedia page: {page_title} ({avg_daily_views:.0f} daily views)"
-                                    )
-                                    break
-
-                except requests.RequestException as e:
-                    logging.debug(f"Network error for '{term}': {e}")
-                    continue
-
-        except Exception as e:
-            logging.debug(f"Wikipedia error for {clean_source_name}: {e}")
-
-        finally:
-            self.wikipedia_cache[cache_key] = result
-            self._save_cache(self.wikipedia_cache, self.wikipedia_cache_file)
-
-        return result
-
-    def _clean_search_term(self, term):
-        """Clean search term"""
-        clean = re.sub(r"\s*\([^)]+\)$", "", term)  # Remove (parentheses)
-        clean = re.sub(r":\s*.*$", "", clean)  # Remove : suffixes
-        return clean.strip()
+        if "listen_notes" in self.enabled_scorers:
+            # TODO: Implement Listen Notes API
+            self.api_managers["listen_notes"] = APIManager("Listen Notes")
+            # self.listen_notes_api = ListenNotesAPI(cache_manager=self.api_managers["listen_notes"])
+            logging.info("Listen Notes API enabled but not yet implemented")
 
     def get_source_prominence_score(self, source_name, url=None):
         """Calculate prominence score using configured tiers"""
@@ -238,46 +114,74 @@ class RobustInfluenceCollector:
         name_lower = clean_source_name.lower()
 
         if any(domain in name_lower for domain in config.tier1_domains):
-            score = config.tier1_score
+            score = config.prominence_scores["tier1"]
             logging.info(f"Tier 1 match: {clean_source_name} -> {score}")
         elif any(domain in name_lower for domain in config.tier2_domains):
-            score = config.tier2_score
+            score = config.prominence_scores["tier2"]
             logging.info(f"Tier 2 match: {clean_source_name} -> {score}")
         elif any(indicator in name_lower for indicator in config.tier3_indicators):
-            score = config.tier3_score
+            score = config.prominence_scores["tier3"]
             logging.info(f"Tier 3 match: {clean_source_name} -> {score}")
         else:
-            score = config.unknown_source_score
+            score = config.prominence_scores["unknown"]
             logging.info(f"Unknown source: {clean_source_name} -> {score}")
 
         return {"source_prominence_score": min(100, score)}
 
     def calculate_robust_influence_score(self, all_metrics):
-        """Calculate final influence score"""
-        wiki_score = all_metrics.get("wikipedia_interest_score", 0)
-        prominence_score = all_metrics.get("source_prominence_score", 0)
+        """Calculate final influence score using only enabled scorers"""
+        final_score = 0
 
-        final_score = (wiki_score / 100) * config.wikipedia_weight + (
-            prominence_score / 100
-        ) * config.prominence_weight
+        # Use enabled scorer weights
+        if "heuristics" in self.enabled_scorers:
+            prominence_score = all_metrics.get("source_prominence_score", 0)
+            heuristics_weight = self.enabled_scorers["heuristics"] / 100
+            final_score += prominence_score * heuristics_weight
+
+        if "wikipedia" in self.enabled_scorers:
+            wiki_score = all_metrics.get("wikipedia_score", 0)
+            wikipedia_weight = self.enabled_scorers["wikipedia"] / 100
+            final_score += wiki_score * wikipedia_weight
+
+        # TODO: Add other scorer scores when implemented
+        # if "youtube" in self.enabled_scorers:
+        #     youtube_score = all_metrics.get("youtube_score", 0)
+        #     youtube_weight = self.enabled_scorers["youtube"] / 100
+        #     final_score += (youtube_score / 100) * youtube_weight
+
         return min(100, final_score)
+
+    def get_required_columns(self):
+        """Dynamically determine which columns to add based on enabled scorers"""
+        columns = ["robust_influence_score"]  # Always include final score
+
+        if "heuristics" in self.enabled_scorers:
+            columns.append("source_prominence_score")
+
+        if "wikipedia" in self.enabled_scorers:
+            columns.extend(
+                [
+                    "has_wikipedia_page",
+                    "wikipedia_title",
+                    "wikipedia_avg_daily_views",
+                    "wikipedia_score",
+                ]
+            )
+
+        if "youtube" in self.enabled_scorers:
+            columns.extend(
+                ["youtube_subscriber_count", "youtube_view_count", "youtube_score"]
+            )
+
+        # Add other scorer columns as needed...
+        return columns
 
     def process_all_media_types(self, df):
         """Process all sources"""
-        logging.info("Processing sources with reliable metrics...")
-
-        new_columns = [
-            "has_wikipedia_page",
-            "wikipedia_title",
-            "wikipedia_avg_daily_views",
-            "wikipedia_interest_score",
-            "source_prominence_score",
-            "robust_influence_score",
-        ]
-
-        for col in new_columns:
-            if col not in df.columns:
-                df[col] = None
+        # Get dynamic columns based on enabled scorers
+        new_columns = self.get_required_columns()
+        new_cols_dict = {col: None for col in new_columns if col not in df.columns}
+        df = df.assign(**new_cols_dict)
 
         for idx, row in df.iterrows():
             source_name = row["Moniker"]
@@ -290,20 +194,42 @@ class RobustInfluenceCollector:
             all_metrics = {}
 
             try:
-                # Get Wikipedia data
-                wiki_data = self.get_wikipedia_pageviews(clean_source_name, media_type)
-                all_metrics.update(wiki_data)
+                # Get Wikipedia data if enabled
+                if "wikipedia" in self.enabled_scorers and hasattr(
+                    self, "wikipedia_api"
+                ):
+                    wiki_data = self.wikipedia_api.get_wikipedia_pageviews(
+                        clean_source_name, media_type
+                    )
+                    all_metrics.update(wiki_data)
 
-            except RateLimitExceeded:
-                print(
-                    f"Rate limit reached. Processed {idx} sources. Run again to continue."
+                # Get YouTube data if enabled
+                if "youtube" in self.enabled_scorers and hasattr(self, "youtube_api"):
+                    youtube_data = self.youtube_api.get_youtube_metrics(
+                        clean_source_name, url
+                    )
+                    all_metrics.update(youtube_data)
+
+                # Future APIs can be added here...
+
+            except Exception as e:
+                # Handle rate limit exceptions from any API
+                if self.RateLimitExceeded and isinstance(e, self.RateLimitExceeded):
+                    print(
+                        f"Rate limit reached. Processed {idx} sources. Run again to continue."
+                    )
+
+                    # Save all caches when any API hits rate limit
+                    self.save_all_caches()
+                    break
+                raise
+
+            # Get prominence score if enabled
+            if "heuristics" in self.enabled_scorers:
+                prominence_data = self.get_source_prominence_score(
+                    clean_source_name, url
                 )
-                self._save_cache(self.wikipedia_cache, self.wikipedia_cache_file)
-                break
-
-            # Get prominence score
-            prominence_data = self.get_source_prominence_score(clean_source_name, url)
-            all_metrics.update(prominence_data)
+                all_metrics.update(prominence_data)
 
             # Calculate final score
             influence_score = self.calculate_robust_influence_score(all_metrics)
@@ -316,26 +242,47 @@ class RobustInfluenceCollector:
 
             time.sleep(config.request_delay)
 
-            # Save progress periodically
+            # Save progress periodically - now saves ALL caches
             if (idx + 1) % config.save_frequency == 0:
-                self._save_cache(self.wikipedia_cache, self.wikipedia_cache_file)
+                self.save_all_caches()
                 logging.info(f"Progress saved ({idx + 1}/{len(df)})")
 
-        # Final save and cleanup
-        self._save_cache(self.wikipedia_cache, self.wikipedia_cache_file)
+        # Final save - saves ALL caches
+        self.save_all_caches()
 
-        # Convert to proper numeric types
-        numeric_columns = [
-            "robust_influence_score",
-            "wikipedia_interest_score",
-            "source_prominence_score",
-            "wikipedia_avg_daily_views",
-        ]
+        # Convert to proper numeric types for only the columns that exist
+        numeric_columns = self._get_numeric_columns()
         for col in numeric_columns:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors="coerce")
 
         return df
+
+    def _get_numeric_columns(self):
+        """Get numeric column names based on enabled scorers"""
+        numeric_columns = ["robust_influence_score"]  # Always numeric
+
+        if "heuristics" in self.enabled_scorers:
+            numeric_columns.append("source_prominence_score")
+
+        if "wikipedia" in self.enabled_scorers:
+            numeric_columns.extend(["wikipedia_score", "wikipedia_avg_daily_views"])
+
+        if "youtube" in self.enabled_scorers:
+            numeric_columns.extend(["youtube_subscribers", "youtube_score"])
+
+        # Add other APIs as needed
+        return numeric_columns
+
+    def save_all_caches(self):
+        """Save all enabled API caches to disk"""
+        if not hasattr(self, "api_managers") or not self.api_managers:
+            logging.debug("No API managers to save")
+            return
+
+        for api_name, api_manager in self.api_managers.items():
+            api_manager.save_cache_to_disk()
+            logging.debug(f"Saved {api_name} cache")
 
     def show_summary(self, df):
         """Show results summary"""
@@ -348,11 +295,12 @@ class RobustInfluenceCollector:
         print(f"Processed: {processed}/{total_sources} sources")
 
         # Add detailed API call information:
-        elapsed_hours = (
-            datetime.now() - self.session_start_time
-        ).total_seconds() / 3600
-        print(f"Total API calls made: {self.api_call_count}")
-        print(f"Runtime: {elapsed_hours:.2f} hours")
+        if hasattr(self, "wikipedia_api"):
+            elapsed_hours = (
+                datetime.now() - self.wikipedia_api.session_start_time
+            ).total_seconds() / 3600
+            print(f"Total API calls made: {self.wikipedia_api.api_call_count}")
+            print(f"Runtime: {elapsed_hours:.2f} hours")
 
         # Top 10 overall
         print(f"\nTOP INFLUENCE SCORES:")
@@ -378,7 +326,6 @@ def main():
     try:
         df = pd.read_csv(config.input_file)
         print(f"Loaded {len(df)} sources from {config.input_file}")
-        logging.info(f"Input file: {config.input_file}")
 
         df_enhanced = collector.process_all_media_types(df)
         collector.show_summary(df_enhanced)
@@ -391,7 +338,7 @@ def main():
         return 1
     except KeyboardInterrupt:
         print("\nInterrupted. Progress saved.")
-        collector._save_cache(collector.wikipedia_cache, collector.wikipedia_cache_file)
+        collector.save_all_caches()
         return 1
 
 
