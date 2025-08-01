@@ -211,14 +211,14 @@ class RobustInfluenceCollector:
                     wiki_data = self.wikipedia_api.get_wikipedia_pageviews(
                         clean_source_name, media_type
                     )
-                    all_metrics.update(wiki_data)
+                    all_metrics.update(wiki_data)  # type:ignore
 
                 # Get YouTube data if enabled
                 if "youtube" in self.enabled_scorers and hasattr(self, "youtube_api"):
                     youtube_data = self.youtube_api.get_youtube_metrics(
                         clean_source_name, url
                     )
-                    all_metrics.update(youtube_data)
+                    all_metrics.update(youtube_data)  # type:ignore
 
                 # Future APIs can be added here...
 
