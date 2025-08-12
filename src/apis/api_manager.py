@@ -2,12 +2,13 @@
 """
 Standardized API Manager for handling caching, rate limiting, and quota tracking
 Works consistently across all APIs with different cost structures
+NOW WITH PERSISTENT QUOTA TRACKING across script runs
 """
 
 import pickle
 import os
 import logging
-from datetime import datetime
+from datetime import datetime, date
 
 import config
 
@@ -22,11 +23,6 @@ class APIManager:
     def __init__(
         self,
         api_name,
-        cache_filename=None,
-        daily_quota_limit=None,
-        hourly_limit=None,
-        warning_threshold=None,
-        stop_threshold=None,
     ):
         """
         Initialize API manager with standardized quota and rate limiting
@@ -43,48 +39,117 @@ class APIManager:
         self.api_name = api_name
 
         # Quota and rate limiting settings
-        self.daily_quota_limit = daily_quota_limit
-        api_dict_key = api_name.lower().replace(" ", "_")
-        self.hourly_limit = hourly_limit or config.api_rate_limits.get(
-            api_dict_key, 100
-        )
-        self.warning_threshold = warning_threshold or config.warning_threshold
-        self.stop_threshold = stop_threshold or config.stop_threshold
+        self.daily_quota_limit = api_config["daily_quota_limit"]
+        self.hourly_limit = api_config["hourly_limit"]
+        self.warning_threshold = config.warning_threshold
+        self.stop_threshold = config.stop_threshold
 
-        # Tracking metrics
-        self.api_call_count = 0
-        self.quota_units_used = 0
+        # Session tracking (for current run)
         self.session_start_time = datetime.now()
+        self.session_api_calls = 0
 
         # Setup cache file path
         os.makedirs(config.cache_dir, exist_ok=True)
-        cache_filename = cache_filename or config.api_cache_files.get(
-            api_dict_key, f"{api_dict_key}_cache.pkl"
-        )
-        self.cache_file_path = os.path.join(config.cache_dir, cache_filename)
+        api_dict_key = api_name.lower().replace(" ", "_")
 
-        # Load cache data from disk into memory
+        self.cache_file_path = os.path.join(
+            config.cache_dir, f"{api_dict_key}_cache.pkl"
+        )
+        self.quota_file_path = os.path.join(
+            config.cache_dir, f"{api_dict_key}_quota.pkl"
+        )
+
+        # Load persistent quota data and cache data
+        self.quota_data = self._load_quota_data()
         self.cache_data = self._load_cache_from_disk()
+
+        # Reset counters if new day/hour
+        self._reset_expired_quotas()
 
         # Log initialization with quota/rate info
         if self.daily_quota_limit is not None:
+            quota_used = self.quota_data.get("daily_quota_used", 0)
             logging.info(
-                f"{self.api_name}: Quota-based API (limit: {self.daily_quota_limit:,} units/day) - "
+                f"{self.api_name}: Quota-based API (used: {quota_used:,}/{self.daily_quota_limit:,} units today) - "
                 f"{len(self.cache_data)} entries loaded from cache"
             )
         else:
+            current_hour_calls = self.quota_data.get("hourly_calls", 0)
             logging.info(
-                f"{self.api_name}: Rate-limited API (limit: {self.hourly_limit} calls/hour) - "
+                f"{self.api_name}: Rate-limited API (used: {current_hour_calls}/{self.hourly_limit} calls this hour) - "
                 f"{len(self.cache_data)} entries loaded from cache"
             )
+
+    def _load_quota_data(self):
+        """Load persistent quota tracking data from disk"""
+        try:
+            if os.path.exists(self.quota_file_path):
+                with open(self.quota_file_path, "rb") as f:
+                    data = pickle.load(f)
+                    logging.debug(f"Loaded quota data from {self.quota_file_path}")
+                    return data
+        except Exception as e:
+            logging.warning(f"Could not load quota data {self.quota_file_path}: {e}")
+
+        # Return default quota structure
+        return {
+            "daily_quota_used": 0,
+            "daily_reset_date": date.today().isoformat(),
+            "hourly_calls": 0,
+            "hourly_reset_time": datetime.now()
+            .replace(minute=0, second=0, microsecond=0)
+            .isoformat(),
+            "total_api_calls": 0,
+        }
+
+    def _save_quota_data(self):
+        """Save persistent quota data to disk"""
+        try:
+            with open(self.quota_file_path, "wb") as f:
+                pickle.dump(self.quota_data, f)
+            logging.debug(f"Saved quota data to {self.quota_file_path}")
+        except Exception as e:
+            logging.error(f"Could not save quota data {self.quota_file_path}: {e}")
+
+    def _reset_expired_quotas(self):
+        """Reset quota counters if time periods have expired"""
+        now = datetime.now()
+        today = date.today()
+        current_hour = now.replace(minute=0, second=0, microsecond=0)
+
+        # Check if we need to reset daily quota
+        stored_date = date.fromisoformat(
+            self.quota_data.get("daily_reset_date", today.isoformat())
+        )
+        if today > stored_date:
+            logging.info(
+                f"{self.api_name}: New day detected - resetting daily quota (was {self.quota_data.get('daily_quota_used', 0)} units)"
+            )
+            self.quota_data["daily_quota_used"] = 0
+            self.quota_data["daily_reset_date"] = today.isoformat()
+
+        # Check if we need to reset hourly quota
+        stored_hour = datetime.fromisoformat(
+            self.quota_data.get("hourly_reset_time", current_hour.isoformat())
+        )
+        if current_hour > stored_hour:
+            logging.info(
+                f"{self.api_name}: New hour detected - resetting hourly calls (was {self.quota_data.get('hourly_calls', 0)} calls)"
+            )
+            self.quota_data["hourly_calls"] = 0
+            self.quota_data["hourly_reset_time"] = current_hour.isoformat()
+
+        # Save any resets
+        self._save_quota_data()
 
     def _load_cache_from_disk(self):
         """Load cache data from disk file into memory"""
         try:
             if os.path.exists(self.cache_file_path):
                 with open(self.cache_file_path, "rb") as f:
-                    return pickle.load(f)
-                logging.debug(f"Loaded cache from {self.cache_file_path}")
+                    data = pickle.load(f)
+                    logging.debug(f"Loaded cache from {self.cache_file_path}")
+                    return data
         except Exception as e:
             logging.warning(f"Could not load {self.cache_file_path}: {e}")
         return {}
@@ -114,15 +179,23 @@ class APIManager:
 
     def log_api_call(self, description="", quota_cost=1, call_type="standard"):
         """
-        Standardized API call logging with quota/rate awareness
+        Standardized API call logging with PERSISTENT quota/rate tracking
 
         Args:
             description: Description of the API call
             quota_cost: Cost in quota units (1 for most calls, 100+ for expensive calls)
             call_type: Type of call ("search", "details", "bulk", etc.)
         """
-        self.api_call_count += 1
-        self.quota_units_used += quota_cost
+        # Update session counters
+        self.session_api_calls += 1
+
+        # Update persistent counters
+        self.quota_data["daily_quota_used"] += quota_cost
+        self.quota_data["hourly_calls"] += 1
+        self.quota_data["total_api_calls"] += 1
+
+        # Save quota data immediately after each call
+        self._save_quota_data()
 
         # Different logging strategies based on quota system
         if self.daily_quota_limit:
@@ -137,7 +210,8 @@ class APIManager:
             self._log_rate_limited_call(description, quota_cost, call_type)
             return
 
-        quota_percent = (self.quota_units_used / self.daily_quota_limit) * 100
+        daily_used = self.quota_data["daily_quota_used"]
+        quota_percent = (daily_used / self.daily_quota_limit) * 100
 
         # Choose priority based on cost
         if quota_cost >= 100:
@@ -149,94 +223,51 @@ class APIManager:
 
         logging.info(
             f"{self.api_name} {priority}: {description} "
-            f"(Cost: {quota_cost} units | Total: {self.quota_units_used:,}/{self.daily_quota_limit:,} "
+            f"(Cost: {quota_cost} units | Daily Total: {daily_used:,}/{self.daily_quota_limit:,} "
             f"= {quota_percent:.1f}%)"
         )
 
         # Quota warnings
         if quota_percent >= 95:
-            logging.error(f"{self.api_name} QUOTA CRITICAL: {quota_percent:.1f}% used!")
+            logging.error(
+                f"{self.api_name} QUOTA CRITICAL: {quota_percent:.1f}% used today!"
+            )
         elif quota_percent >= 80:
-            logging.warning(f"{self.api_name} quota high: {quota_percent:.1f}% used")
+            logging.warning(
+                f"{self.api_name} quota high: {quota_percent:.1f}% used today"
+            )
 
     def _log_rate_limited_call(self, description, quota_cost, call_type):
         """Log calls for rate-limited APIs (like Wikipedia)"""
-        elapsed_hours = (
-            datetime.now() - self.session_start_time
-        ).total_seconds() / 3600
+        hourly_calls = self.quota_data["hourly_calls"]
 
-        if elapsed_hours >= 1.0:
-            calls_per_hour = self.api_call_count / elapsed_hours
-            logging.info(
-                f"{self.api_name} {description} "
-                f"(Call #{self.api_call_count} | Rate: {calls_per_hour:.0f}/hour)"
-            )
-        else:
-            logging.info(
-                f"{self.api_name} {description} " f"(Call #{self.api_call_count})"
-            )
+        logging.info(
+            f"{self.api_name} {description} "
+            f"(Call #{hourly_calls} this hour | Session: #{self.session_api_calls})"
+        )
 
     def is_rate_limit_exceeded(self, upcoming_cost=1):
-        """Check if upcoming call would exceed limits"""
+        """Check if upcoming call would exceed limits using PERSISTENT data"""
         if self.daily_quota_limit is not None:
-            # Quota-based check
-            would_use = self.quota_units_used + upcoming_cost
+            # Quota-based check using persistent daily usage
+            daily_used = self.quota_data["daily_quota_used"]
+            would_use = daily_used + upcoming_cost
             return would_use > (self.daily_quota_limit * self.stop_threshold)
         else:
-            # Rate-based check (existing logic)
-            return self._check_rate_limit()
-
-    def _check_rate_limit(self):
-        """Check rate limits for non-quota APIs"""
-        elapsed_hours = (
-            datetime.now() - self.session_start_time
-        ).total_seconds() / 3600
-
-        # Simple logic: if less than 1 hour, just check total calls
-        if elapsed_hours < 1.0:
-            warning_threshold = self.hourly_limit * self.warning_threshold
-            stop_threshold = self.hourly_limit * self.stop_threshold
-
-            if self.api_call_count > warning_threshold:
-                logging.warning(
-                    f"{self.api_name}: High API usage: {self.api_call_count} calls in {elapsed_hours:.2f} hours (warning at {warning_threshold})"
-                )
-
-            if self.api_call_count > stop_threshold:
-                logging.error(
-                    f"{self.api_name}: Approaching rate limit! Saving progress..."
-                )
-                self.save_cache_to_disk()
-                return True
-        else:
-            # After 1 hour, use calls per hour calculation
-            calls_per_hour = self.api_call_count / elapsed_hours
-            warning_threshold = self.hourly_limit * self.warning_threshold
-            stop_threshold = self.hourly_limit * self.stop_threshold
-
-            if calls_per_hour > warning_threshold:
-                logging.warning(
-                    f"{self.api_name}: High API usage: {calls_per_hour:.0f} calls/hour (limit: {self.hourly_limit})"
-                )
-
-            if calls_per_hour > stop_threshold:
-                logging.error(
-                    f"{self.api_name}: Approaching rate limit! Saving progress..."
-                )
-                self.save_cache_to_disk()
-                return True
-
-        return False
+            # Rate-based check using persistent hourly usage
+            hourly_calls = self.quota_data["hourly_calls"]
+            return hourly_calls >= (self.hourly_limit * self.stop_threshold)
 
     def get_usage_summary(self):
-        """Get standardized usage summary"""
+        """Get standardized usage summary using PERSISTENT data"""
         if self.daily_quota_limit is not None:
-            usage_percent = (self.quota_units_used / self.daily_quota_limit) * 100
+            daily_used = self.quota_data["daily_quota_used"]
+            usage_percent = (daily_used / self.daily_quota_limit) * 100
             return {
                 "type": "quota",
                 "api_name": self.api_name,
-                "calls": self.api_call_count,
-                "quota_used": self.quota_units_used,
+                "calls": self.quota_data["total_api_calls"],
+                "quota_used": daily_used,
                 "quota_limit": self.daily_quota_limit,
                 "usage_percent": usage_percent,
                 "status": (
@@ -246,17 +277,16 @@ class APIManager:
                 ),
             }
         else:
-            elapsed_hours = (
-                datetime.now() - self.session_start_time
-            ).total_seconds() / 3600
-            rate = self.api_call_count / max(elapsed_hours, 0.1)
+            hourly_calls = self.quota_data["hourly_calls"]
+            rate_percent = (hourly_calls / self.hourly_limit) * 100
             return {
                 "type": "rate_limited",
                 "api_name": self.api_name,
-                "calls": self.api_call_count,
-                "rate": rate,
-                "rate_limit": self.hourly_limit,
-                "status": "good",
+                "calls": self.quota_data["total_api_calls"],
+                "hourly_calls": hourly_calls,
+                "hourly_limit": self.hourly_limit,
+                "rate_percent": rate_percent,
+                "status": ("warning" if rate_percent >= 80 else "good"),
             }
 
     @staticmethod

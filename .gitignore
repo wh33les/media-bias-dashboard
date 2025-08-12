@@ -8,3 +8,5 @@ __pycache__
 *.twbr~
 ~$*.twb
 ~$*.twbx
+
+tests/

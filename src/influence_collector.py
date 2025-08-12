@@ -73,11 +73,7 @@ class RobustInfluenceCollector:
             from apis.wikipedia_api import WikipediaAPI
 
             # Wikipedia is rate-limited, not quota-based
-            self.api_managers["wikipedia"] = APIManager(
-                "Wikipedia",
-                daily_quota_limit=None,  # No daily quota
-                hourly_limit=200,  # Rate limited instead
-            )
+            self.api_managers["wikipedia"] = APIManager("Wikipedia")
             self.wikipedia_api = WikipediaAPI(
                 session=self.session, api_manager=self.api_managers["wikipedia"]
             )
@@ -87,31 +83,11 @@ class RobustInfluenceCollector:
             from apis.youtube_api import YouTubeAPI
 
             # YouTube is quota-based (10,000 units per day)
-            self.api_managers["youtube"] = APIManager(
-                "YouTube",
-                daily_quota_limit=10000,  # YouTube's daily quota
-                hourly_limit=None,  # No hourly limit
-            )
+            self.api_managers["youtube"] = APIManager("YouTube")
             self.youtube_api = YouTubeAPI(
                 session=self.session, api_manager=self.api_managers["youtube"]
             )
             logging.info("YouTube API initialized with quota tracking")
-
-        if "similarweb" in self.enabled_scorers:
-            # TODO: Implement SimilarWeb API with appropriate limits
-            self.api_managers["similarweb"] = APIManager(
-                "SimilarWeb", daily_quota_limit=1000, hourly_limit=100  # Example quota
-            )
-            logging.info("SimilarWeb API enabled but not yet implemented")
-
-        if "listen_notes" in self.enabled_scorers:
-            # TODO: Implement Listen Notes API with appropriate limits
-            self.api_managers["listen_notes"] = APIManager(
-                "Listen Notes",
-                daily_quota_limit=10000,  # Example quota
-                hourly_limit=1000,
-            )
-            logging.info("Listen Notes API enabled but not yet implemented")
 
     def get_source_prominence_score(self, source_name):
         """Calculate prominence score using configured tiers"""

@@ -16,7 +16,6 @@ cache_dir = "tests/cache_files"
 save_frequency = 10  # Save progress every N items
 
 # Scorers configuration (scores should add up to 100)
-# Temporarily disable YouTube due to quota usage - re-enable tomorrow or after quota increase
 scorers_config = {
     "heuristics": 60,  # Heuristics for all media types (default)
     "wikipedia": 40,  # Influence for all media types (free, rate-limited)
@@ -26,39 +25,17 @@ scorers_config = {
 }
 
 # API settings
-user_agent = "media-bias-dashboard/1.0 (https://github.com/wh33les/data-visualization-portfolio; contact via GitHub) Python-requests/2.32.4"
+user_agent = "media-bias-dashboard/1.0 (https://github.com/wh33les/media-bias-dashboard; contact via GitHub) Python-requests/2.32.4"
 timeout_seconds = 5
 request_delay = 0.1  # Seconds between requests
-
-# API cache filenames
-api_cache_files = {
-    "wikipedia": "wikipedia_cache.pkl",
-    "youtube": "youtube_cache.pkl",
-    "similarweb": "similarweb_cache.pkl",
-    "listen_notes": "listen_notes_cache.pkl",
-}
-
-# API rate limits (calls per hour) - for non-quota APIs like Wikipedia
-api_rate_limits = {
-    "wikipedia": 200,  # Wikipedia is generous but we should be respectful
-    "youtube": None,  # YouTube uses daily quotas, not hourly rates
-    "similarweb": 100,  # Estimated
-    "listen_notes": 1000,  # Estimated
-}
 
 # Quota management thresholds
 warning_threshold = 0.8  # Warn at 80% of limit
 stop_threshold = 0.9  # Stop at 90% of limit
 
-# Daily quota limits (for quota-based APIs)
-api_daily_quotas = {
-    "youtube": 10000,  # YouTube's default daily quota
-    "similarweb": 1000,  # Estimated
-    "listen_notes": 10000,  # Estimated
-    "wikipedia": None,  # No daily quota, rate-limited instead
-}
+# ----------
 
-# Heuristics config - Enhanced for ML portfolio demonstration
+# Heuristics config
 # Scoring defaults
 prominence_scores = {"tier1": 95, "tier2": 75, "tier3": 55, "unknown": 25}
 
@@ -194,34 +171,10 @@ tier3_indicators = [
     "editorial",
 ]
 
-# ML Engineering Enhancement: Add confidence scoring for better feature engineering
-confidence_multipliers = {
-    "exact_match": 1.0,  # Exact domain match in tier lists
-    "partial_match": 0.85,  # Partial match with high confidence
-    "keyword_match": 0.7,  # Keyword indicators match
-    "unknown": 0.5,  # Low confidence fallback
-}
-
-# Cost tracking for quota management (units per call type)
-api_costs = {
-    "youtube": {
-        "search": 100,  # Very expensive!
-        "channel_details": 1,  # Cheap
-        "channel_by_username": 1,  # Cheap
-        "video_details": 1,  # Cheap
-        "video_list": 1,  # Cheap
-    },
-    "wikipedia": {
-        "summary": 1,  # All Wikipedia calls cost 1 "unit" for rate limiting
-        "pageviews": 1,
-        "search": 1,
-    },
-    "similarweb": {
-        "domain_stats": 10,  # Estimated
-        "traffic_overview": 5,  # Estimated
-    },
-    "listen_notes": {
-        "search": 5,  # Estimated
-        "podcast_details": 1,  # Estimated
-    },
-}
+# # ML Engineering Enhancement: Add confidence scoring for better feature engineering
+# confidence_multipliers = {
+#     "exact_match": 1.0,  # Exact domain match in tier lists
+#     "partial_match": 0.85,  # Partial match with high confidence
+#     "keyword_match": 0.7,  # Keyword indicators match
+#     "unknown": 0.5,  # Low confidence fallback
+# }
